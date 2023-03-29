@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
+
+import javax.xml.validation.ValidatorHandler;
 /**
  * The RunFlight main class is responsible for running all necessary methods withing the PA3 folder. the system provides a user friendly 
  * interface for the customer/employee to access the MinerAirlines System. Each the customer and the employee have different use cases on
@@ -68,7 +70,7 @@ public class RunFlight {
           System.out.println("\nWecome back " + firstName + " " + lastName +"!");
         }
         else{
-            System.out.println("\nSorry, that name is not in our list. Please try again");
+            System.out.println("\nSorry, that name was not in our list. Please try again");
         }
     }
 
@@ -98,7 +100,7 @@ public class RunFlight {
 
     if(isEmployee){
       System.out.println("\nOur system noticed that your username is in our employee list. Please select an option below.");
-      System.out.println("\n1) Make flight changes \n2) Purchase tickets");
+      System.out.println("\n1) Make flight changes \n2) Purchase tickets\n");
 
       while(verifyInput){
         System.out.print("Enter option: ");
@@ -111,43 +113,109 @@ public class RunFlight {
           isEmployee = false; //This lets us know that the employee is going to be a customer today
         }
         else{
-          System.out.println("That was not an option, please try again.");
+          System.out.println("\nThat was not an option, please try again.");
         }
       }
     }
-
+    int flightID = -1;
+    int verifyFlightID = -1;
     verifyInput = true; //reset to true for future inputs
-    while(verifyInput && isEmployee){
-      while(verifyInput && isEmployee){ //Employee is logged in
-        System.out.println("\nPlease enter a flight ID to make changes or view flight status.");
-        System.out.print("Enter flight ID: ");
-        int flightID = Integer.parseInt(userInput.nextLine());
-        int verifyID = flightID;
-        while(verifyInput){
-          if(verifyID > 0 && verifyID <= flightLog.size()){
-            System.out.println("\nHere is the information for flight ID " + flightID + ": \n");
-            flightLog.get(verifyID).printFlight();
-            break;
-          }
-          else{
-              System.out.println("That flight ID number was not found please try again.");
-              flightID = userInput.nextInt();
-              verifyID = flightID;
-              if(verifyID > 0 && verifyID <= flightLog.size() ){
-                  break;
+    boolean verifyIDEmployeeMenu = true;
+    while (verifyInput && isEmployee) {
+
+      while (verifyInput && isEmployee && verifyIDEmployeeMenu) { // Employee is logged in
+          try {
+              System.out.println("\nPlease enter a flight ID to make changes or to view flight status.");
+              System.out.print("Enter flight ID: ");
+  
+              String input = userInput.nextLine();
+  
+              if (input.matches("-?\\d+")) { // Check if the input is an integer (including negative numbers)
+                  flightID = Integer.parseInt(input);
+                  //verifyIDEmployeeMenu = false;
+                  verifyFlightID = flightID;
+  
+                  if (verifyFlightID > 0 && verifyFlightID <= flightLog.size()) {
+                      System.out.println("\nHere is the information for flight ID " + flightID + ": \n");
+                      flightLog.get(verifyFlightID).printFlight();
+                      employeeMenuOptions(flightLog.get(flightID), logFile, myWriter, cancelFlightCsv, userInput, ticketHistoryCSVFileReader(ticketPurchaseHistory), customerLog);
+                      verifyInput = false;
+                      verifyIDEmployeeMenu = false;
+                  } else {
+                      System.out.println("\n* That Flight ID number does not exist. Please try again. *");
+                  }
+              } else {
+                  System.out.println("\n* Please enter a valid integer for the employee main menu. *");
               }
+          } catch (NumberFormatException e) {
+              System.out.println("\n* Please enter a valid integer for the employee main menu. *");
           }
-        }
-        employeeMenuOptions(flightLog.get(flightID), logFile, myWriter, cancelFlightCsv, userInput, ticketHistoryCSVFileReader(ticketPurchaseHistory),customerLog);
-        verifyInput = false;
       }
+  
+      verifyInput = true;
+  
+      System.out.println("\nWould you like to make changes on a different flight?\n\nPlease enter [Y/N]");
+  
+      while (verifyMenuOption) {
+          System.out.print("Enter option: ");
+          String verifyCancelTicket = userInput.nextLine();
+          if (verifyCancelTicket.equalsIgnoreCase("Y")) {
+              verifyMenuOption = false;
+              verifyInput = true;
+              verifyIDEmployeeMenu = true; // reset the employee ID menu verification
+          } else if (verifyCancelTicket.equalsIgnoreCase("N")) {
+              verifyMenuOption = false;
+              verifyInput = false;
+          } else {
+              System.out.println("\nThat was not an option. Please try again.");
+          }
+      }
+      verifyMenuOption = true;
+    }
+  
+    /*
+    while(verifyInput && isEmployee){
+
+      while(verifyInput && isEmployee && verifyIDEmployeeMenu){ //Employee is logged in
+        //System.out.println("\nPlease enter a flight ID to make changes or to view flight status.");
+        //System.out.print("Enter flight ID: ");
+        try {
+          /*
+          flightID = Integer.parseInt(userInput.nextLine());
+          verifyIDEmployeeMenu = false;
+          verifyFlightID = flightID;
+          
+          while(verifyInput){
+            System.out.println("\nPlease enter a flight ID to make changes or to view flight status.");
+            System.out.print("Enter flight ID: ");
+            flightID = Integer.parseInt(userInput.nextLine());
+            verifyIDEmployeeMenu = false;
+            verifyFlightID = flightID;
+            if(verifyFlightID > 0 && verifyFlightID <= flightLog.size()){
+              System.out.println("\nHere is the information for flight ID " + flightID + ": \n");
+              flightLog.get(verifyFlightID).printFlight();
+              employeeMenuOptions(flightLog.get(flightID), logFile, myWriter, cancelFlightCsv, userInput, ticketHistoryCSVFileReader(ticketPurchaseHistory),customerLog);
+              verifyInput = false;
+              verifyIDEmployeeMenu = false;
+            }
+            else{
+              System.out.println("\n* That Flight ID number does not exists please try again *");
+            }
+          }
+
+        } catch (NumberFormatException e) {
+            System.out.println("\n* Please enter a valid integer for the employee main menu *");
+        }
+      }
+      
       verifyInput = true;
       System.out.println("\nWould you like to make changes on a different flight? \n\nPleast enter [Y/N]");
       while(verifyMenuOption){
-        System.out.print("Enter option:");
+        System.out.print("Enter option: ");
         String verifyCancelTicket = userInput.nextLine();
         if(verifyCancelTicket.equalsIgnoreCase("Y")){
           verifyMenuOption = false;
+          verifyInput = true;
         }
         else if(verifyCancelTicket.equalsIgnoreCase("N")){
           verifyMenuOption = false;
@@ -159,6 +227,7 @@ public class RunFlight {
       }
       verifyMenuOption = true;
     }
+    */
     
     //******************************************** Customer ********************************************//
     while(verifyInput && !isEmployee){ //Verify username and password for customer
@@ -193,9 +262,17 @@ public class RunFlight {
       while(verifyInput){
         System.out.println("\nPlease select an option before continuing.");
         System.out.print("\n1) View tickets purchased. \n2) Cancel a ticket. \n3) View flights \n4) Log out\n");
-      
-        System.out.print("\nEnter option:");
-        int mainMenuOption = Integer.parseInt(userInput.nextLine());
+        int mainMenuOption = -1;
+        
+        System.out.print("\nEnter option: ");
+
+        try {
+          mainMenuOption = Integer.parseInt(userInput.nextLine());
+          verifyMenuOption = false;
+        } catch (NumberFormatException e) {
+            System.out.println("\n* Please enter a valid integer for the main menu *");
+        }
+        
         if(mainMenuOption == 1){
           if(ticketsBought.size() == 0){
             System.out.println("\nIt seems that you have not bought any tickets yet.");
@@ -213,11 +290,11 @@ public class RunFlight {
               printTicketsBought(ticketsBought);
               System.out.println("\nBased on this list which ticket do you want to cancel?");
               System.out.println("\n* Please be aware that the MinerAirlines transaction fee WILL NOT be returned *");
-              System.out.print("\nEnter option:");
+              System.out.print("\nEnter option: ");
               int ticketCancel = Integer.parseInt(userInput.nextLine());
               System.out.println("\nAre you sure you want to cancel ticket number: " + ticketCancel + ". Enter Y/N.");
               while(verifyInput){
-                System.out.print("Enter option:");
+                System.out.print("Enter option: ");
                 String verifyCancelTicket = userInput.nextLine();
                 if(verifyCancelTicket.equalsIgnoreCase("Y")){
                   cancelTicketMenu(ticketsBought, currCustomer, flightLog, ticketCancel - 1, myWriter);
@@ -235,13 +312,103 @@ public class RunFlight {
             }
         }
         else if(mainMenuOption == 3){
-          //verifyInput = false;
           verifyInput = true; //reset to true for future inputs
-
-          System.out.println("Here is a list of all schedualed flights.");
-          printFlights(flightLog);
-          System.out.println("\nPlease enter a flight ID number, remember you can only purchace one ticket per transaction.");
-          int flightID = Integer.parseInt(userInput.nextLine());
+          flightID = -1;
+          String flightNumber = "";
+          String code = "";
+          String originCode = "";
+          String destinationCode = "";
+          boolean verifyID = true;
+          boolean verifyFlightNumber = true;
+          HashMap<Integer, Flight> flightsByCodes = new HashMap<Integer, Flight>();
+          
+          System.out.println("\nHow would you like to search for your flight?" +"\n\n- To search by Flight ID enter \"FLight ID\". " + "\n- To search by Flight Number enter \"Flight Number\"." 
+          + "\n- To search by Orgin/Destination Airport Code enter \"Codes\".");
+          while(verifyInput){
+            System.out.print("Enter option: ");
+            String searchOption = userInput.nextLine();
+            if (searchOption.equalsIgnoreCase("FLight ID")){
+              System.out.println("\nPlease enter the flight ID number, remember you can only purchace one ticket per transaction.");
+              while (verifyID) {
+                System.out.print("Enter Flight ID: ");
+                try {
+                    flightID = Integer.parseInt(userInput.nextLine());
+                    if (flightID > 0 && flightID < flightLog.size()) {
+                        verifyID = false;
+                    } else {
+                        System.out.println("\nInvalid Flight ID number please try again.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("\n* Please enter a valid integer for the Flight ID *");
+                }
+              }
+              verifyInput = false;
+            } else if (searchOption.equalsIgnoreCase("FLight Number")){
+              System.out.println("\nPlease enter the flight number, remember you can only purchace one ticket per transaction.");
+              System.out.print("Enter Flight Number: ");
+              flightNumber = userInput.nextLine();
+              flightID = searchByFlightNumber(flightLog, flightNumber, userInput);
+              verifyInput = false;
+            } else if (searchOption.equalsIgnoreCase("Codes")){
+              
+              while(verifyInput){
+                System.out.println("\nRemember you can only purchace one ticket per transaction.");
+                System.out.println("\nPlease enter the origin code.");
+                System.out.print("Enter origin code: ");
+                originCode = userInput.nextLine();
+                System.out.println("\nPlease enter the destination code.");
+                System.out.print("Enter destination code: ");
+                destinationCode = userInput.nextLine();
+                flightsByCodes = flightsByCodes(flightLog, originCode, destinationCode);
+                if (flightsByCodes.size() > 0){
+                  verifyInput = false;
+                  printFlightsByCodes(flightLog, originCode, destinationCode, userInput);
+                }
+                else{
+                  System.out.println("\n* Invalid Origin/Destination Code, Please try again *");
+                }
+              }
+              System.out.println("\nBased on these flights shown, how would you like to select your flight?" + "\n- To search by Flight ID enter \"FLight ID\". " + "\n- To search by Flight Number enter \"Flight Number\".");
+              verifyInput = true;
+              while(verifyInput){
+                System.out.print("Enter option: ");
+                searchOption = userInput.nextLine();
+                if (searchOption.equalsIgnoreCase("FLight ID")){
+                  System.out.println("\nPlease enter the flight ID number, remember you can only purchace one ticket per transaction.");
+                  while (verifyID) {
+                    System.out.print("Enter Flight ID: ");
+                    try {
+                        flightID = Integer.parseInt(userInput.nextLine());
+                        if (flightExistByID(flightsByCodes, flightID)) {
+                            verifyID = false;
+                        } else {
+                            System.out.println("\n* Invalid Flight ID number based on orgin code:" + originCode + " and destination code: " + destinationCode + " please enter a flight ID that matches the flights above *\n");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("\n* Please enter a valid integer for the Flight ID *");
+                    }
+                  }
+                  verifyInput = false;
+                } else if (searchOption.equalsIgnoreCase("FLight Number")){
+                  System.out.println("\nPlease enter the flight number, remember you can only purchace one ticket per transaction.");
+                  System.out.print("Enter Flight Number: ");
+                  flightNumber = userInput.nextLine();
+                  flightID = searchByFlightNumber(flightsByCodes, flightNumber, userInput);
+                  verifyInput = false;
+                } else{
+                  System.out.println("\n* That was not an option please try again *");
+                }
+              }
+            } else{
+                System.out.println("\n* That was not an option please try again *");
+            }
+          }
+          verifyInput = true; //reset to true for future inputs
+          verifyID = true;
+          verifyFlightNumber = true;
+          verifyMenuOption = true;
+          //System.out.println("\nPlease enter a flight ID number, remember you can only purchace one ticket per transaction.");
+          //int flightID = Integer.parseInt(userInput.nextLine());
           System.out.println("\nHere is the flight's information that you have choosen.\n");
           flightLog.get(flightID).printFlight();
           if(flightLog.get(flightID).isInternational()){         //Check if this flight has a surcharge
@@ -276,7 +443,11 @@ public class RunFlight {
 
           while(verifyMenuOption){ //Verify customer's option input
             System.out.print("Enter option: ");
-            ticketOption = Integer.parseInt(userInput.nextLine());
+            try {
+              ticketOption = Integer.parseInt(userInput.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("\n* Please enter a valid integer for the Flight ID *");
+            }
             if(ticketOption == 1 && flightLog.get(flightID).isFirstClassSoldOut()){
               System.out.println("\nFirst class SOLD OUT!");
             }
@@ -293,10 +464,12 @@ public class RunFlight {
             else{
               System.out.println("That is not an option, Please try again.");
             }
+
           }
 
           verifyInput = true; //reset to true for future inputs
-          if(currCustomer.getRole().equalsIgnoreCase("Employee")){
+
+          if(currCustomer.getRole().equalsIgnoreCase("Employee") && !isEmployee){
             System.out.println("\n* Remeber that you will get a 50% discount on First Class tickets and a 75% discount on all other ticket purchases * \n\n* Fees and taxes still apply *");
           }
 
@@ -359,7 +532,7 @@ public class RunFlight {
           verifyInput = false;
         }
         else{
-          System.out.println("That was not an option please try again.");
+          System.out.println("\n* That was not an option please try again *");
         }
       }
       
@@ -388,9 +561,9 @@ public class RunFlight {
      * @throws IOException This exception is used for the file writter objects, this will let us know if there was a problem while writting the file.
      */
     public static void employeeMenuOptions(Flight currFlightObj, String logText, FileWriter myWriter, FileWriter csvWriter, Scanner userInput, ArrayList<Ticket> ticketsBought,HashMap<Integer,Customer> customerLog) throws IOException{ //This method provides all availiable changes and options
-      String newChange;
-      String question;
-      String changeInfo;
+      String newChange = "";
+      String question = "";
+      String changeInfo = "";
       boolean verifyInput = true;
       boolean cancelFlightInput = true;
       try {
@@ -400,15 +573,33 @@ public class RunFlight {
           e.printStackTrace();
         }
       while(verifyInput){
-          System.out.println("\n" + "Would you like to change any of the following? Please select an option.\n" 
+        boolean isDigit = true;
+        System.out.println("\n" + "Would you like to change any of the following? Please select an option.\n" 
                                       + "1 - Origin Airport\n" + "2 - Origin Code\n" + "3 - Destination Airport\n" + "4 - Destination Code\n"
                                       + "5 - Departure Date\n" + "6 - Departure Time\n" + "7 - First Class Price\n" + "8 - Buisness Class Price\n"
                                       + "9 - Main Cabin Price\n" + "10 - View customers on this flight and flight revenue\n"
-                                      + "11 - cancel current flight\n" + "12 - Make no changes\n" + "\nEnter Option below:");
-          changeInfo = userInput.nextLine();
+                                      + "11 - cancel current flight\n" + "12 - Make no changes\n");
+          //changeInfo = userInput.nextLine();
+          while(verifyInput){
+            System.out.print("Enter option below: ");
+            changeInfo = userInput.nextLine();
+            try {
+                int option = Integer.parseInt(changeInfo);
+                if (option < 1 || option > 12) {
+                    System.out.println("\n* That was not an option please try again *");
+                } else {
+                    verifyInput = false;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("\n* That was not an option please try again *");
+            }
+          }
+
+          verifyInput = true;
           switch(Integer.parseInt(changeInfo)){
               case 1: //Origin Airport change
                   System.out.println("\nWhat is the new Origin Airport:");
+                  System.out.print("Enter new airport: ");
                   newChange = userInput.nextLine();
                   currFlightObj.setOriginAirport(newChange);
                   System.out.println("\nChange was succesful! here is the new information.\n");
@@ -424,6 +615,7 @@ public class RunFlight {
                   break;
               case 2: //Origin Code change
                   System.out.println("\nWhat is the new Origin Code:");
+                  System.out.print("Enter new code: ");
                   newChange = userInput.nextLine();
                   currFlightObj.setOriginCode(newChange);
                   System.out.println("\nChange was succesful! here is the new information.\n");
@@ -439,6 +631,7 @@ public class RunFlight {
                   break;
               case 3: //Destination Airport change
                   System.out.println("\nWhat is the new Destination Airport:");
+                  System.out.print("Enter new airport: ");
                   newChange = userInput.nextLine();
                   currFlightObj.setDestinationAirport(newChange);
                   System.out.println("\nChange was succesful! here is the new information.\n");
@@ -454,6 +647,7 @@ public class RunFlight {
                   break;
               case 4: //Destination Code change
                   System.out.println("\nWhat is the new Destination Code:");
+                  System.out.print("Enter new code: ");
                   newChange = userInput.nextLine();
                   currFlightObj.setDestinationCode(newChange);
                   System.out.println("\nChange was succesful! here is the new information.\n");
@@ -469,6 +663,7 @@ public class RunFlight {
                   break;
               case 5: //Departure Date change
                   System.out.println("\nWhat is the new Departure Date in MM/DD/YYYY:");
+                  System.out.print("Enter new date: ");
                   newChange = userInput.nextLine();
                   currFlightObj.changeDepartureDate(newChange);; //CHANGE ARRIVAL TIME
                   System.out.println("\nChange was succesful! here is the new information.\n");
@@ -485,6 +680,7 @@ public class RunFlight {
                   break;
               case 6: //Departure Time change
                   System.out.println("\nWhat is the new Departure Time in HH:MM (military time):");
+                  System.out.print("Enter new time: ");
                   newChange = userInput.nextLine();
                   currFlightObj.changeDepartureTime(newChange);//CHANGE ARRIVAL TIME
                   System.out.println("\nChange was succesful! here is the new information.\n");
@@ -500,6 +696,7 @@ public class RunFlight {
                   break;
               case 7: //First Class Price change
                   System.out.println("\nWhat is the new First Class Price:");
+                  System.out.print("Enter new price: ");
                   newChange = userInput.nextLine();
                   currFlightObj.setFirstClassPrice(Integer.parseInt(newChange));
                   System.out.println("\nChange was succesful! here is the new information.\n");
@@ -515,6 +712,7 @@ public class RunFlight {
                   break;
               case 8: //Business Class Price change
                   System.out.println("\nWhat is the new Business Class Price:");
+                  System.out.print("Enter new price: ");
                   newChange = userInput.nextLine();
                   currFlightObj.setBusinessClassPrice(Integer.parseInt(newChange));
                   System.out.println("\nChange was succesful! here is the new information.\n");
@@ -530,6 +728,7 @@ public class RunFlight {
                   break;
               case 9: //Main Cabin Price change
                   System.out.println("\nWhat is the new Main Class Price:");
+                  System.out.print("Enter new price: ");
                   newChange = userInput.nextLine();
                   currFlightObj.setMainCabinPrice(Integer.parseInt(newChange));
                   System.out.println("\nChange was succesful! here is the new information.\n");
@@ -612,7 +811,7 @@ public class RunFlight {
                    + "\n1) All ticket sales will be returned to the customers.\n" + "2) This flight will no longer be available to sell tickets.\n"
                    + "\nPlease enter Y indicating that you understand these conditions, or N to not cancel this flight.");
                    while (cancelFlightInput){
-                    System.out.print("Enter option:");
+                    System.out.print("Enter option: ");
                     String cancelTicket = userInput.nextLine();
                     if(cancelTicket.equalsIgnoreCase("Y")){
                       try {
@@ -671,7 +870,7 @@ public class RunFlight {
 
                   break;
               case 12: //No change
-                  System.out.println("\nNo changes were made.\n");
+                  System.out.println("\nNo changes were made.");
                   try {
                       myWriter.write("No changes were made");
                       myWriter.write("\n");
@@ -686,7 +885,7 @@ public class RunFlight {
           }
 
           System.out.println("\nWould you like to make another change on Flight ID " +currFlightObj.getID() + "? [Y,N]");
-          System.out.print("Enter option:");
+          System.out.print("Enter option: ");
           question = userInput.nextLine(); // flush
           if(question.equalsIgnoreCase("y")){
               System.out.println("Here is the menu again.\n");
@@ -816,16 +1015,16 @@ public class RunFlight {
           token = currLine.split(",");
 
           // Extract the required information based on the header positions
-          int ID = IDIndex != -1 ? Integer.parseInt(token[IDIndex]) : 0; //
+          int ID = IDIndex != -1 ? Integer.parseInt(token[IDIndex]) : 0;
           String flightNum = flightNumberIndex != -1 ? token[flightNumberIndex] : "";
           String originAirport = originAirportIndex != -1 ? token[originAirportIndex] : "";
-          String originCode = originCodeIndex != -1 ? token[originCodeIndex] : ""; //
+          String originCode = originCodeIndex != -1 ? token[originCodeIndex] : "";
           String destinationAirport = destinationAirportIndex != -1 ? token[destinationAirportIndex] : "";
-          String destinationCode = destinationCodeIndex != -1 ? token[destinationCodeIndex] : ""; //
-          String departureDate = departingDateIndex != -1 ? token[departingDateIndex] : ""; //
-          String departureTime = departingTimeIndex != -1 ? token[departingTimeIndex] : ""; //
-          String arrivalDate = arrivalDateIndex != -1 ? token[arrivalDateIndex] : ""; //
-          String arrivalTime = arrivalTimeIndex != -1 ? token[arrivalTimeIndex] : ""; //
+          String destinationCode = destinationCodeIndex != -1 ? token[destinationCodeIndex] : "";
+          String departureDate = departingDateIndex != -1 ? token[departingDateIndex] : "";
+          String departureTime = departingTimeIndex != -1 ? token[departingTimeIndex] : "";
+          String arrivalDate = arrivalDateIndex != -1 ? token[arrivalDateIndex] : "";
+          String arrivalTime = arrivalTimeIndex != -1 ? token[arrivalTimeIndex] : "";
           String flightType = typeIndex != -1 ? token[typeIndex] : "";
           int surcharge = surchargeIndex != -1 ? Integer.parseInt(token[surchargeIndex]) : 0;
           boolean foodServed = foodServedIndex != -1 ? Boolean.parseBoolean(token[foodServedIndex]) : false;
@@ -833,22 +1032,22 @@ public class RunFlight {
           boolean originAirportLounge = originAirportLoungeIndex != -1 ? Boolean.parseBoolean(token[originAirportLoungeIndex]) : false;
           int routeCost = routeCostIndex != -1 ? Integer.parseInt(token[routeCostIndex]) : 0;  
           int minerPoints = minerPointsIndex != -1 ? Integer.parseInt(token[minerPointsIndex]) : 0;
-          int duration = durationIndex != -1 ? Integer.parseInt(token[durationIndex]) : 0; //
+          int duration = durationIndex != -1 ? Integer.parseInt(token[durationIndex]) : 0;
           int distance = distanceIndex != -1 ? Integer.parseInt(token[distanceIndex]) : 0;
           int timeZoneDifference = timeZoneDifferenceIndex != -1 ? Integer.parseInt(token[timeZoneDifferenceIndex]) : 0;
-          int firstClassPrice = firstClassPriceIndex != -1 ? Integer.parseInt(token[firstClassPriceIndex]) : 0; //
+          int firstClassPrice = firstClassPriceIndex != -1 ? Integer.parseInt(token[firstClassPriceIndex]) : 0;
           int businessClassPrice = businessClassPriceIndex != -1 ? Integer.parseInt(token[businessClassPriceIndex]) : 0;
           int mainCabinPrice = mainCabinPriceIndex != -1 ? Integer.parseInt(token[mainCabinPriceIndex]) : 0;
           int firstClassSeats = firstClassSeatsIndex != -1 ? Integer.parseInt(token[firstClassSeatsIndex]) : 0;
           int businessClassSeats = businessClassSeatsIndex != -1 ? Integer.parseInt(token[businessClassSeatsIndex]) : 0;
           int mainCabinSeats = mainCabinSeatsIndex != -1 ? Integer.parseInt(token[mainCabinSeatsIndex]) : 0;
           int totalSeats = totalSeatsIndex != -1 ? Integer.parseInt(token[totalSeatsIndex]) : 0;
-          String destinationAirportState = destinationAirportStateIndex != -1 ? token[destinationAirportStateIndex] : ""; //
-          String destinationAirportCity = destinationAirportCityIndex != -1 ? token[destinationAirportCityIndex] : ""; //
-          String destinationAirportCountry = destinationAirportCountryIndex != -1 ? token[destinationAirportCountryIndex] : ""; //
-          String originAirportCity = originAirportCityIndex != -1 ? token[originAirportCityIndex] : ""; //
-          String originAirportCountry = originAirportCountryIndex != -1 ? token[originAirportCountryIndex] : ""; //
-          String originAirportState = originAirportStateIndex != -1 ? token[originAirportStateIndex] : ""; //
+          String destinationAirportState = destinationAirportStateIndex != -1 ? token[destinationAirportStateIndex] : "";
+          String destinationAirportCity = destinationAirportCityIndex != -1 ? token[destinationAirportCityIndex] : "";
+          String destinationAirportCountry = destinationAirportCountryIndex != -1 ? token[destinationAirportCountryIndex] : "";
+          String originAirportCity = originAirportCityIndex != -1 ? token[originAirportCityIndex] : "";
+          String originAirportCountry = originAirportCountryIndex != -1 ? token[originAirportCountryIndex] : "";
+          String originAirportState = originAirportStateIndex != -1 ? token[originAirportStateIndex] : ""; 
           float orginAirportFee = originAirportFeeIndex != -1 ? Float.parseFloat(token[originAirportFeeIndex]) : 0.0f;
           float destinationAirportFee = destinationAirportFeeIndex != -1 ? Float.parseFloat(token[destinationAirportFeeIndex]) : 0.0f;
 
@@ -1045,7 +1244,10 @@ public class RunFlight {
           while(checkTickets){ //Check is the number of tickets does not exceed 6
             System.out.print("\nNumber of tickets: ");
             ticketsPurchase = Integer.parseInt(userInput.nextLine()); //check heeeerrrr
-
+            if (ticketsPurchase == 0){
+              System.out.println("\nNo tickets were bought.");
+              break;
+            }
             if(firstClassTicketCt.checkNumOfTickets(ticketsPurchase)){ // checks the amount of tickets entered
               checkTickets = false;
             }
@@ -1763,5 +1965,61 @@ public class RunFlight {
       }
       return flightTypeList;
     }
+
+    public static int searchByFlightNumber(HashMap<Integer, Flight> flightLog, String flightNumber, Scanner userInput){
+      boolean verifyInput = true;
+      int i = 1;
+      while(verifyInput){
+        while(i < flightLog.size() + 1){
+            if(flightLog.get(i).getFlightNum().equalsIgnoreCase(flightNumber)){
+                verifyInput = false;
+                return flightLog.get(i).getID();
+            }
+            i++;
+        }
+        System.out.println("\n* Invalid flight number please try again *");
+        System.out.print("Enter Flight Number: ");
+        flightNumber = userInput.nextLine();
+        i = 1;
+      }
+      return -1;
+    }
+  
+    public static void printFlightsByCodes(HashMap<Integer, Flight> flightLog, String originCode, String destinationCode, Scanner userInput){
+      int i = 1;
+      while(i < flightLog.size() + 1){
+          if(flightLog.get(i).getOriginCode().equalsIgnoreCase(originCode) && flightLog.get(i).getDestinationCode().equalsIgnoreCase(destinationCode)){
+              flightLog.get(i).printFlight();
+              System.out.println();
+          }
+          i++;
+      }
+    }
+
+    public static HashMap<Integer,Flight> flightsByCodes(HashMap<Integer, Flight> flightLog, String originCode, String destinationCode){
+      int i = 1;
+      int flightIDX = 1;
+      HashMap<Integer,Flight> flightsByCode = new HashMap<Integer, Flight>();
+      while(i < flightLog.size() + 1){
+          if(flightLog.get(i).getOriginCode().equalsIgnoreCase(originCode) && flightLog.get(i).getDestinationCode().equalsIgnoreCase(destinationCode)){
+              flightsByCode.put(flightIDX, flightLog.get(i));
+              flightIDX++;
+          }
+          i++;
+      }
+      return flightsByCode;
+    }
+
+    public static boolean flightExistByID(HashMap<Integer, Flight> flightLog, int flightID){
+      int i = 1;
+      while(i < flightLog.size() + 1){
+        if(flightLog.get(i).getID() == flightID){
+          return true;
+        }
+        i++;
+      }
+      return false;
+    }
+
 
 }
