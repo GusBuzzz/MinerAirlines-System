@@ -33,7 +33,7 @@ public class RunFlight {
     String customerInfo = "CustomerListPA4.csv";
     String ticketPurchaseHistory = "CustomerTicketsPurchase.csv";
     String cancelFlightList = "cancelFlights.csv";
-    String updatedCustomerLog = "NewCustomerListPA3.csv";
+    String updatedCustomerLog = "NewCustomerListPA4.csv";
     String updatedFlightScheduleLog = "NewFlightSchedule.csv";
     String logFile = "Log.txt";
     boolean verifyInput = true;
