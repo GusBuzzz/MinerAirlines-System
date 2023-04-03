@@ -1,0 +1,156 @@
+Confirmation Number: 3005
+Flight Origin Airport Code: ORL
+Flight Origin Airport Name: Orlando International Airport
+Flight Destination Airport Code: LAX
+Flight Destination Airport Name: Los Angeles International Airport
+Departure Date: 3/23/23
+Departure Time: 12:10 PM
+Arrival Date: 3/23/23
+Arrival Time: 1:51 PM
+Ticket Type: Business Class
+Ticket Quantity: 6
+Total Cost: 438.535
+
+Confirmation Number: 3732
+Flight Origin Airport Code: BOS
+Flight Origin Airport Name: Logan International Airport
+Flight Destination Airport Code: LAX
+Flight Destination Airport Name: Los Angeles International Airport
+Departure Date: 3/24/23
+Departure Time: 5:30 AM
+Arrival Date: 3/24/23
+Arrival Time: 7:56 AM
+Ticket Type: Main Class
+Ticket Quantity: 3
+Total Cost: 551.164
+
+Confirmation Number: 4105
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: DFW
+Flight Destination Airport Name: Dallas/Ft. Worth International Airport
+Departure Date: 3/25/23
+Departure Time: 8:25 AM
+Arrival Date: 3/25/23
+Arrival Time: 10:59 AM
+Ticket Type: First Class
+Ticket Quantity: 6
+Total Cost: 1553.2582
+
+Confirmation Number: 4105
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: DFW
+Flight Destination Airport Name: Dallas/Ft. Worth International Airport
+Departure Date: 3/25/23
+Departure Time: 8:25 AM
+Arrival Date: 3/25/23
+Arrival Time: 10:59 AM
+Ticket Type: Business Class
+Ticket Quantity: 6
+Total Cost: 0.0
+
+Confirmation Number: 3866
+Flight Origin Airport Code: LAX
+Flight Origin Airport Name: Los Angeles International Airport
+Flight Destination Airport Code: ELP
+Flight Destination Airport Name: El Paso International Airport
+Departure Date: 3/29/23
+Departure Time: 5:30 AM
+Arrival Date: 3/29/23
+Arrival Time: 8:23 AM
+Ticket Type: Business Class
+Ticket Quantity: 5
+Total Cost: 444.829
+
+Confirmation Number: 1299
+Flight Origin Airport Code: ORL
+Flight Origin Airport Name: Orlando International Airport
+Flight Destination Airport Code: LAX
+Flight Destination Airport Name: Los Angeles International Airport
+Departure Date: 3/29/23
+Departure Time: 8:25 AM
+Arrival Date: 3/29/23
+Arrival Time: 10:06 AM
+Ticket Type: Main Class
+Ticket Quantity: 5
+Total Cost: 101.256996
+
+Confirmation Number: 1429
+Flight Origin Airport Code: HND
+Flight Origin Airport Name: Tokyo Haneda Airport
+Flight Destination Airport Code: ELP
+Flight Destination Airport Name: El Paso International Airport
+Departure Date: 3/29/23
+Departure Time: 12:10 PM
+Arrival Date: 3/29/23
+Arrival Time: 8:15 AM
+Ticket Type: Main Class
+Ticket Quantity: 1
+Total Cost: 0.0
+
+Confirmation Number: 4373
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: CDG
+Flight Destination Airport Name: Paris Charles de Gaulle Airport
+Departure Date: 4/2/23
+Departure Time: 12:10 PM
+Arrival Date: 4/3/23
+Arrival Time: 6:49 AM
+Ticket Type: Business Class
+Ticket Quantity: 0
+Total Cost: 0.0
+
+Confirmation Number: 2945
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: ATL
+Flight Destination Airport Name: Hartsfield-Jackson Atlanta International Airport
+Departure Date: 4/6/23
+Departure Time: 5:30 AM
+Arrival Date: 4/6/23
+Arrival Time: 10:31 AM
+Ticket Type: First Class
+Ticket Quantity: 0
+Total Cost: 0.0
+
+Confirmation Number: 2945
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: ATL
+Flight Destination Airport Name: Hartsfield-Jackson Atlanta International Airport
+Departure Date: 4/6/23
+Departure Time: 5:30 AM
+Arrival Date: 4/6/23
+Arrival Time: 10:31 AM
+Ticket Type: Business Class
+Ticket Quantity: 0
+Total Cost: 0.0
+
+Confirmation Number: 1129
+Flight Origin Airport Code: YYZ
+Flight Origin Airport Name: Toronto Pearson International Airport
+Flight Destination Airport Code: ELP
+Flight Destination Airport Name: El Paso International Airport
+Departure Date: 4/6/23
+Departure Time: 12:10 PM
+Arrival Date: 4/6/23
+Arrival Time: 1:49 PM
+Ticket Type: First Class
+Ticket Quantity: 0
+Total Cost: 0.0
+
+Confirmation Number: 1129
+Flight Origin Airport Code: YYZ
+Flight Origin Airport Name: Toronto Pearson International Airport
+Flight Destination Airport Code: ELP
+Flight Destination Airport Name: El Paso International Airport
+Departure Date: 4/6/23
+Departure Time: 12:10 PM
+Arrival Date: 4/6/23
+Arrival Time: 1:49 PM
+Ticket Type: Business Class
+Ticket Quantity: 0
+Total Cost: 0.0
+

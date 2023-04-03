@@ -203,9 +203,12 @@ public class Ticket extends Flight{
      * @return This method will return true or false if the customer has not reach its max number of tickets that can be purchased.
      */
     public boolean checkNumOfTickets(int numOfTickets){
-        boolean verifyTickets = true;
-        if(numOfTickets > this.numOfTicketsAllowed){
-          verifyTickets = false;
+        boolean verifyTickets = false;
+        if(numOfTickets == 0){
+            return verifyTickets;
+        }
+        else if(numOfTickets <= this.numOfTicketsAllowed){
+          verifyTickets = true;
         }
         return verifyTickets;
     }

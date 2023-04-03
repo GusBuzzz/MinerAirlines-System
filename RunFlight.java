@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 
-import javax.xml.validation.ValidatorHandler;
 /**
  * The RunFlight main class is responsible for running all necessary methods withing the PA3 folder. the system provides a user friendly 
  * interface for the customer/employee to access the MinerAirlines System. Each the customer and the employee have different use cases on
@@ -35,16 +34,22 @@ public class RunFlight {
     String cancelFlightList = "cancelFlights.csv";
     String updatedCustomerLog = "NewCustomerListPA4.csv";
     String updatedFlightScheduleLog = "NewFlightSchedule.csv";
+    String autoPurchaseFile1 = "AutoPurchaser10K.csv";
+    String autoPurchaseFile2 = "AutoPurchaser100K.csv";
+    String autoPurchaseFile3 = "AutoPurchaser400K.csv";
+    String ticketSummary = "ticketSummary.txt";
     String logFile = "Log.txt";
-    boolean verifyInput = true;
-    boolean verifyMenuOption = true;
-    boolean isEmployee = false;
-    boolean isEmployeeCustomer = false;
-    String exitOption = "";
-    String firstName = "";
-    String lastName = "";
-    String userName = "";
-    String password = "";
+    //boolean verifyInput = true;
+    //boolean verifyMenuOption = true;
+    //boolean isEmployee = false;
+    //boolean isEmployeeCustomer = false;
+    boolean systemISRunning = true;
+    boolean verifySystemTerminate = true;
+    //String exitOption = "";
+    //String firstName = "";
+    //String lastName = "";
+    //String userName = "";
+    //String password = "";
 
     HashMap<Integer,Flight> flightLog = flights(flightSchedule);
     HashMap<Integer,Flight> flightTypeList = sortFlights(flightLog); // factory 2nd design pattern
@@ -53,185 +58,45 @@ public class RunFlight {
     ArrayList<Ticket> ticketsBought = new ArrayList<Ticket>();
     Scanner userInput = new Scanner(System.in);
     FileWriter myWriter = new FileWriter(logFile);
-    FileWriter csvWriter = new FileWriter(ticketPurchaseHistory, true); //TRUE allows us to not override files after program ends
+    FileWriter csvWriter = new FileWriter(ticketPurchaseHistory); //TRUE allows us to not override files after program ends
     FileWriter cancelFlightCsv = new FileWriter(cancelFlightList,true);
     FileWriter updateCustomerLog = new FileWriter(updatedCustomerLog);
     FileWriter updateFlightLog = new FileWriter(updatedFlightScheduleLog);
+    FileWriter summary = new FileWriter(ticketSummary);
 
-    System.out.println("\nWelcome to Miner Airport, please enter your first and last name.");
+    while(systemISRunning){
+      String exitOption = "";
+      String firstName = "";
+      String lastName = "";
+      String userName = "";
+      String password = "";
+      boolean verifyInput = true;
+      boolean verifyMenuOption = true;
+      boolean isEmployee = false;
+      verifyInput = true; //reset to true for future inputs
+      System.out.println("\nWelcome to Miner Airport, please enter your first and last name.");
 
-    while(verifyInput){ //Check if customer is in the list of customers
-        System.out.print("First Name: "); 
-        firstName = userInput.nextLine();
-        System.out.print("Last Name: ");
-        lastName = userInput.nextLine();
-        if(isInCustomerList(customerLog, firstName, lastName)){
-          verifyInput = false;
-          System.out.println("\nWecome back " + firstName + " " + lastName +"!");
-        }
-        else{
-            System.out.println("\nSorry, that name was not in our list. Please try again");
-        }
-    }
-
-    verifyInput = true; //reset to true for future inputs
-
-    Customer currCustomer = findCustomerObj(customerLog, firstName, lastName);
-
-    isEmployee = findEmplyeeObj(employeeLog, firstName, lastName);
-
-    while(verifyInput && isEmployee){ //Verify username and password for customer
-      System.out.println("\nPlease login using your Username and Password");
-      System.out.print("Username: ");
-      userName = userInput.nextLine();
-      System.out.print("Password: ");
-      password = userInput.nextLine();
-      if(currCustomer.getUsername().equals(userName) && currCustomer.getPassword().equals(password)){
-        System.out.println("\nWelcome back " + currCustomer.getUsername());
-        verifyInput = false;
-      }
-      else{
-        System.out.println("\nUsername or Password is incorret, Please try again.");
-      }
-        
-    }
-
-    verifyInput = true; //reset to true for future inputs
-
-    if(isEmployee){
-      System.out.println("\nOur system noticed that your username is in our employee list. Please select an option below.");
-      System.out.println("\n1) Make flight changes \n2) Purchase tickets\n");
-
-      while(verifyInput){
-        System.out.print("Enter option: ");
-        String option = userInput.nextLine();
-        if(option.equalsIgnoreCase("1")){
-          verifyInput = false;
-        }
-        else if(option.equalsIgnoreCase("2")){
-          verifyInput = false;
-          isEmployee = false; //This lets us know that the employee is going to be a customer today
-        }
-        else{
-          System.out.println("\nThat was not an option, please try again.");
-        }
-      }
-    }
-    int flightID = -1;
-    int verifyFlightID = -1;
-    verifyInput = true; //reset to true for future inputs
-    boolean verifyIDEmployeeMenu = true;
-    while (verifyInput && isEmployee) {
-
-      while (verifyInput && isEmployee && verifyIDEmployeeMenu) { // Employee is logged in
-          try {
-              System.out.println("\nPlease enter a flight ID to make changes or to view flight status.");
-              System.out.print("Enter flight ID: ");
-  
-              String input = userInput.nextLine();
-  
-              if (input.matches("-?\\d+")) { // Check if the input is an integer (including negative numbers)
-                  flightID = Integer.parseInt(input);
-                  //verifyIDEmployeeMenu = false;
-                  verifyFlightID = flightID;
-  
-                  if (verifyFlightID > 0 && verifyFlightID <= flightLog.size()) {
-                      System.out.println("\nHere is the information for flight ID " + flightID + ": \n");
-                      flightLog.get(verifyFlightID).printFlight();
-                      employeeMenuOptions(flightLog.get(flightID), logFile, myWriter, cancelFlightCsv, userInput, ticketHistoryCSVFileReader(ticketPurchaseHistory), customerLog);
-                      verifyInput = false;
-                      verifyIDEmployeeMenu = false;
-                  } else {
-                      System.out.println("\n* That Flight ID number does not exist. Please try again. *");
-                  }
-              } else {
-                  System.out.println("\n* Please enter a valid integer for the employee main menu. *");
-              }
-          } catch (NumberFormatException e) {
-              System.out.println("\n* Please enter a valid integer for the employee main menu. *");
+      while(verifyInput){ //Check if customer is in the list of customers
+          System.out.print("First Name: "); 
+          firstName = userInput.nextLine();
+          System.out.print("Last Name: ");
+          lastName = userInput.nextLine();
+          if(isInCustomerList(customerLog, firstName, lastName)){
+            verifyInput = false;
+            System.out.println("\nWecome back " + firstName + " " + lastName +"!");
+          }
+          else{
+              System.out.println("\nSorry, that name was not in our list. Please try again");
           }
       }
-  
-      verifyInput = true;
-  
-      System.out.println("\nWould you like to make changes on a different flight?\n\nPlease enter [Y/N]");
-  
-      while (verifyMenuOption) {
-          System.out.print("Enter option: ");
-          String verifyCancelTicket = userInput.nextLine();
-          if (verifyCancelTicket.equalsIgnoreCase("Y")) {
-              verifyMenuOption = false;
-              verifyInput = true;
-              verifyIDEmployeeMenu = true; // reset the employee ID menu verification
-          } else if (verifyCancelTicket.equalsIgnoreCase("N")) {
-              verifyMenuOption = false;
-              verifyInput = false;
-          } else {
-              System.out.println("\nThat was not an option. Please try again.");
-          }
-      }
-      verifyMenuOption = true;
-    }
-  
-    /*
-    while(verifyInput && isEmployee){
 
-      while(verifyInput && isEmployee && verifyIDEmployeeMenu){ //Employee is logged in
-        //System.out.println("\nPlease enter a flight ID to make changes or to view flight status.");
-        //System.out.print("Enter flight ID: ");
-        try {
-          /*
-          flightID = Integer.parseInt(userInput.nextLine());
-          verifyIDEmployeeMenu = false;
-          verifyFlightID = flightID;
-          
-          while(verifyInput){
-            System.out.println("\nPlease enter a flight ID to make changes or to view flight status.");
-            System.out.print("Enter flight ID: ");
-            flightID = Integer.parseInt(userInput.nextLine());
-            verifyIDEmployeeMenu = false;
-            verifyFlightID = flightID;
-            if(verifyFlightID > 0 && verifyFlightID <= flightLog.size()){
-              System.out.println("\nHere is the information for flight ID " + flightID + ": \n");
-              flightLog.get(verifyFlightID).printFlight();
-              employeeMenuOptions(flightLog.get(flightID), logFile, myWriter, cancelFlightCsv, userInput, ticketHistoryCSVFileReader(ticketPurchaseHistory),customerLog);
-              verifyInput = false;
-              verifyIDEmployeeMenu = false;
-            }
-            else{
-              System.out.println("\n* That Flight ID number does not exists please try again *");
-            }
-          }
+      verifyInput = true; //reset to true for future inputs
 
-        } catch (NumberFormatException e) {
-            System.out.println("\n* Please enter a valid integer for the employee main menu *");
-        }
-      }
-      
-      verifyInput = true;
-      System.out.println("\nWould you like to make changes on a different flight? \n\nPleast enter [Y/N]");
-      while(verifyMenuOption){
-        System.out.print("Enter option: ");
-        String verifyCancelTicket = userInput.nextLine();
-        if(verifyCancelTicket.equalsIgnoreCase("Y")){
-          verifyMenuOption = false;
-          verifyInput = true;
-        }
-        else if(verifyCancelTicket.equalsIgnoreCase("N")){
-          verifyMenuOption = false;
-          verifyInput = false;
-        }
-        else{
-          System.out.println("\nThat was not an option please try again.");
-        }
-      }
-      verifyMenuOption = true;
-    }
-    */
-    
-    //******************************************** Customer ********************************************//
-    while(verifyInput && !isEmployee){ //Verify username and password for customer
-      if(currCustomer.getRole().equalsIgnoreCase("Customer")){
+      Customer currCustomer = findCustomerObj(customerLog, firstName, lastName);
+
+      isEmployee = findEmplyeeObj(employeeLog, firstName, lastName);
+
+      while(verifyInput && isEmployee){ //Verify username and password for customer
         System.out.println("\nPlease login using your Username and Password");
         System.out.print("Username: ");
         userName = userInput.nextLine();
@@ -244,308 +109,506 @@ public class RunFlight {
         else{
           System.out.println("\nUsername or Password is incorret, Please try again.");
         }
-
-      }
-      else{ //Employee is already logged in
-        verifyInput = false;
-      }
-    }
-
-    verifyInput = true; //reset to true for future inputs
-
-
-    int ticketOption = 0; //Option has not been selected
-
-
-    while(verifyInput && !isEmployee){ //Verify user input when accessing main menu 
-      
-      while(verifyInput){
-        System.out.println("\nPlease select an option before continuing.");
-        System.out.print("\n1) View tickets purchased. \n2) Cancel a ticket. \n3) View flights \n4) Log out\n");
-        int mainMenuOption = -1;
-        
-        System.out.print("\nEnter option: ");
-
-        try {
-          mainMenuOption = Integer.parseInt(userInput.nextLine());
-          verifyMenuOption = false;
-        } catch (NumberFormatException e) {
-            System.out.println("\n* Please enter a valid integer for the main menu *");
-        }
-        
-        if(mainMenuOption == 1){
-          if(ticketsBought.size() == 0){
-            System.out.println("\nIt seems that you have not bought any tickets yet.");
-          }
-          else{
-            System.out.println("\nHere is a list of all the ticket(s) bought.");
-            printTicketsBought(ticketsBought);
-          }
-        }
-        else if(mainMenuOption == 2){
-            if(ticketsBought.size() == 0){
-              System.out.println("\nYou cannot cancel a ticket since you have not bought one yet.");
-            }
-            else{
-              printTicketsBought(ticketsBought);
-              System.out.println("\nBased on this list which ticket do you want to cancel?");
-              System.out.println("\n* Please be aware that the MinerAirlines transaction fee WILL NOT be returned *");
-              System.out.print("\nEnter option: ");
-              int ticketCancel = Integer.parseInt(userInput.nextLine());
-              System.out.println("\nAre you sure you want to cancel ticket number: " + ticketCancel + ". Enter Y/N.");
-              while(verifyInput){
-                System.out.print("Enter option: ");
-                String verifyCancelTicket = userInput.nextLine();
-                if(verifyCancelTicket.equalsIgnoreCase("Y")){
-                  cancelTicketMenu(ticketsBought, currCustomer, flightLog, ticketCancel - 1, myWriter);
-                  verifyInput = false;
-                }
-                else if(verifyCancelTicket.equalsIgnoreCase("N")){
-                  System.out.println("\nTicket was not canceled.");
-                  verifyInput = false;
-                }
-                else{
-                  System.out.println("\nThat was not an option please try again.");
-                }
-              }
-              verifyInput = true;
-            }
-        }
-        else if(mainMenuOption == 3){
-          verifyInput = true; //reset to true for future inputs
-          flightID = -1;
-          String flightNumber = "";
-          String code = "";
-          String originCode = "";
-          String destinationCode = "";
-          boolean verifyID = true;
-          boolean verifyFlightNumber = true;
-          HashMap<Integer, Flight> flightsByCodes = new HashMap<Integer, Flight>();
           
-          System.out.println("\nHow would you like to search for your flight?" +"\n\n- To search by Flight ID enter \"FLight ID\". " + "\n- To search by Flight Number enter \"Flight Number\"." 
-          + "\n- To search by Orgin/Destination Airport Code enter \"Codes\".");
-          while(verifyInput){
-            System.out.print("Enter option: ");
-            String searchOption = userInput.nextLine();
-            if (searchOption.equalsIgnoreCase("FLight ID")){
-              System.out.println("\nPlease enter the flight ID number, remember you can only purchace one ticket per transaction.");
-              while (verifyID) {
-                System.out.print("Enter Flight ID: ");
-                try {
-                    flightID = Integer.parseInt(userInput.nextLine());
-                    if (flightID > 0 && flightID < flightLog.size()) {
-                        verifyID = false;
-                    } else {
-                        System.out.println("\nInvalid Flight ID number please try again.");
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("\n* Please enter a valid integer for the Flight ID *");
-                }
+      }
+
+      int flightID = -1;
+      int verifyFlightID = -1;
+      boolean viewByFlightID = false;
+      HashMap<Integer,Flight> viewFlightsByOriginCode = new HashMap<Integer,Flight>();
+      if(isEmployee){
+        System.out.println("\nOur system noticed that your username is in our employee list.");
+      }
+      while(isEmployee){
+        verifyInput = true; //reset to true for future inputs
+        System.out.println("\nPlease select an option below.");
+        System.out.println("\n1) Make flight changes by flight ID \n2) View all airports' status by code \n3) Auto-purchase Test \n4) Customer ticket summary \n5) Purchase tickets (As customer)");
+
+        while(verifyInput){
+          System.out.print("Enter option: ");
+          String option = userInput.nextLine();
+          if(option.equalsIgnoreCase("1")){
+            verifyInput = false;
+            viewByFlightID = true;
+          }
+          else if(option.equalsIgnoreCase("2")){
+            while(verifyInput){
+              System.out.println("\nPlease enter the airport code.");
+              System.out.print("Enter code: ");
+              String airportCode = userInput.nextLine();
+              viewFlightsByOriginCode = flightsByOriginCode(flightLog, airportCode);
+              if(viewFlightsByOriginCode.size() == 0){
+                System.out.println("\n* Invalid input, Code does not exist *");
               }
-              verifyInput = false;
-            } else if (searchOption.equalsIgnoreCase("FLight Number")){
-              System.out.println("\nPlease enter the flight number, remember you can only purchace one ticket per transaction.");
-              System.out.print("Enter Flight Number: ");
-              flightNumber = userInput.nextLine();
-              flightID = searchByFlightNumber(flightLog, flightNumber, userInput);
-              verifyInput = false;
-            } else if (searchOption.equalsIgnoreCase("Codes")){
-              
-              while(verifyInput){
-                System.out.println("\nRemember you can only purchace one ticket per transaction.");
-                System.out.println("\nPlease enter the origin code.");
-                System.out.print("Enter origin code: ");
-                originCode = userInput.nextLine();
-                System.out.println("\nPlease enter the destination code.");
-                System.out.print("Enter destination code: ");
-                destinationCode = userInput.nextLine();
-                flightsByCodes = flightsByCodes(flightLog, originCode, destinationCode);
-                if (flightsByCodes.size() > 0){
-                  verifyInput = false;
-                  printFlightsByCodes(flightLog, originCode, destinationCode, userInput);
-                }
-                else{
-                  System.out.println("\n* Invalid Origin/Destination Code, Please try again *");
-                }
+              else{
+                System.out.println("\nHere are all of the airports' status with code: " + airportCode);
+                printFlightsEmployeeFormat(viewFlightsByOriginCode);
+                verifyInput = false;
               }
-              System.out.println("\nBased on these flights shown, how would you like to select your flight?" + "\n- To search by Flight ID enter \"FLight ID\". " + "\n- To search by Flight Number enter \"Flight Number\".");
-              verifyInput = true;
-              while(verifyInput){
-                System.out.print("Enter option: ");
-                searchOption = userInput.nextLine();
-                if (searchOption.equalsIgnoreCase("FLight ID")){
-                  System.out.println("\nPlease enter the flight ID number, remember you can only purchace one ticket per transaction.");
-                  while (verifyID) {
-                    System.out.print("Enter Flight ID: ");
-                    try {
-                        flightID = Integer.parseInt(userInput.nextLine());
-                        if (flightExistByID(flightsByCodes, flightID)) {
-                            verifyID = false;
-                        } else {
-                            System.out.println("\n* Invalid Flight ID number based on orgin code:" + originCode + " and destination code: " + destinationCode + " please enter a flight ID that matches the flights above *\n");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("\n* Please enter a valid integer for the Flight ID *");
-                    }
+            }
+          }
+          else if(option.equalsIgnoreCase("3")){
+            
+            System.out.println("\nProcessing 10k customer file...");
+            autoPurchaseTest(autoPurchaseFile1, flightLog, customerLog, myWriter, csvWriter, ticketPurchaseHistory, logFile, ticketsBought);
+            System.out.println("Program successfully finished 10k customers!");
+            /*
+            System.out.println("\nProcessing 100k customer file...");
+            autoPurchaseTest(autoPurchaseFile2, flightLog, customerLog, myWriter, csvWriter, ticketPurchaseHistory, logFile, ticketsBought);
+            System.out.println("Program successfully finished 100k customers!");
+            
+            System.out.println("\nProcessing 400k customer file...");
+            autoPurchaseTest(autoPurchaseFile3, flightLog, customerLog, myWriter, csvWriter, ticketPurchaseHistory, logFile, ticketsBought);
+            System.out.println("Program successfully finished 400k customers!");
+            */
+            verifyInput = false;
+          }
+          else if(option.equalsIgnoreCase("4")){
+            boolean verifyTicketInput = true;
+            System.out.println("\nPlease enter a customer's first and last name.");
+            while(verifyTicketInput){ //Check if customer is in the list of customers
+              System.out.print("First Name: "); 
+              String ticketFirstName = userInput.nextLine();
+              System.out.print("Last Name: ");
+              String ticketLastName = userInput.nextLine();
+              if(isInCustomerList(customerLog, ticketFirstName, ticketLastName)){
+                for(int i = 1; i < flightLog.size() + 1; i++){
+                  processTickets(summary,flightLog.get(i), ticketFirstName, ticketLastName);
+                  //System.out.println(i);
+                }
+                System.out.println("\nFile has been created.");;
+                verifyTicketInput = false;
+              }
+              else{
+                  System.out.println("\nSorry, that name was not in our list. Please try again");
+              }
+            }
+            
+            verifyInput = false;
+          }
+          else if(option.equalsIgnoreCase("5")){
+            verifyInput = false;
+            isEmployee = false; //This lets us know that the employee is going to be a customer today
+          }
+          else{
+            System.out.println("\nThat was not an option, please try again.");
+          }
+        }
+
+        if(isEmployee){
+          verifyInput = true;
+        }
+        boolean verifyIDEmployeeMenu = true;
+        while (verifyInput && isEmployee && viewByFlightID) {
+
+          while (verifyInput && isEmployee && verifyIDEmployeeMenu) { // Employee is logged in
+              try {
+                  System.out.println("\nPlease enter a flight ID to make changes or to view flight status.");
+                  System.out.print("Enter flight ID: ");
+      
+                  String input = userInput.nextLine();
+      
+                  if (input.matches("-?\\d+")) { // Check if the input is an integer (including negative numbers)
+                      flightID = Integer.parseInt(input);
+                      //verifyIDEmployeeMenu = false;
+                      verifyFlightID = flightID;
+      
+                      if (verifyFlightID > 0 && verifyFlightID <= flightLog.size()) {
+                          System.out.println("\nHere is the information for flight ID " + flightID + ": \n");
+                          flightLog.get(verifyFlightID).printFlight();
+                          employeeMenuOptions(flightLog.get(flightID), logFile, myWriter, cancelFlightCsv, userInput, ticketHistoryCSVFileReader(ticketPurchaseHistory), customerLog);
+                          verifyInput = false;
+                          verifyIDEmployeeMenu = false;
+                          viewByFlightID = false;
+                      } else {
+                          System.out.println("\n* That Flight ID number does not exist. Please try again. *");
+                      }
+                  } else {
+                      System.out.println("\n* Please enter a valid integer for the employee main menu. *");
                   }
-                  verifyInput = false;
-                } else if (searchOption.equalsIgnoreCase("FLight Number")){
-                  System.out.println("\nPlease enter the flight number, remember you can only purchace one ticket per transaction.");
-                  System.out.print("Enter Flight Number: ");
-                  flightNumber = userInput.nextLine();
-                  flightID = searchByFlightNumber(flightsByCodes, flightNumber, userInput);
-                  verifyInput = false;
-                } else{
-                  System.out.println("\n* That was not an option please try again *");
-                }
+              } catch (NumberFormatException e) {
+                  System.out.println("\n* Please enter a valid integer for the employee main menu. *");
               }
-            } else{
-                System.out.println("\n* That was not an option please try again *");
-            }
           }
-          verifyInput = true; //reset to true for future inputs
-          verifyID = true;
-          verifyFlightNumber = true;
+      
+          verifyInput = true;
+      
+          System.out.println("\nWould you like to make changes on a different flight?\n\nPlease enter [Y/N]");
+      
+          while (verifyMenuOption) {
+              System.out.print("Enter option: ");
+              String verifyCancelTicket = userInput.nextLine();
+              if (verifyCancelTicket.equalsIgnoreCase("Y")) {
+                  verifyMenuOption = false;
+                  verifyInput = true;
+                  verifyIDEmployeeMenu = true; // reset the employee ID menu verification
+              } else if (verifyCancelTicket.equalsIgnoreCase("N")) {
+                  verifyMenuOption = false;
+                  verifyInput = false;
+              } else {
+                  System.out.println("\nThat was not an option. Please try again.");
+              }
+          }
           verifyMenuOption = true;
-          //System.out.println("\nPlease enter a flight ID number, remember you can only purchace one ticket per transaction.");
-          //int flightID = Integer.parseInt(userInput.nextLine());
-          System.out.println("\nHere is the flight's information that you have choosen.\n");
-          flightLog.get(flightID).printFlight();
-          if(flightLog.get(flightID).isInternational()){         //Check if this flight has a surcharge
-            System.out.println("\nThe flight that you have choosen has an international destination, there will be an extra $" + flightLog.get(flightID).getSurcharge() +
-            " PER SEAT that you purchase.");
+        }
+        
+        String exitProgram = "";
+        while(verifyInput){
+          System.out.println();
+          System.out.println("Would you like to go back to the employee main menu? [Y/N]");
+          System.out.print("Enter option: ");
+          exitProgram = userInput.nextLine();
+          if(exitProgram.equalsIgnoreCase("Y")){
+            verifyInput = false;
           }
-          System.out.println("\nHere is your available balance and the different ticket prices of Flight ID: " + flightID);
-          System.out.print("\nYour available balance is: "); // + currCustomer.getMoneyAvailable()); ///fix format of money
-          System.out.printf("%.2f", currCustomer.getMoneyAvailable());
-          if(flightLog.get(flightID).getFirstClassSeats() > 0){
-            System.out.println("\n1) First class price: " + flightLog.get(flightID).getFirstClassPrice());
-          }
-          else{
-            System.out.println("\n1) First class SOLD OUT!");
-            flightLog.get(flightID).setFirstClassSoldOut(true);
-          }
-          if(flightLog.get(flightID).getBusinessClassSeats() > 0){
-            System.out.println("2) Business class price: " + flightLog.get(flightID).getBusinessClassPrice());
+          else if (exitProgram.equalsIgnoreCase("N")){
+            verifyInput = false;
+            isEmployee = false;
           }
           else{
-            System.out.println("2) Business class SOLD OUT!");
-            flightLog.get(flightID).setBusinessClassSoldOut(true);
+            System.out.println("\n* That was not an option please try again *");
           }
-          if(flightLog.get(flightID).getMainCabinSeats() > 0){
-            System.out.println("3) Main cabin price: " + flightLog.get(flightID).getMainCabinPrice());
-          }
-          else{
-            System.out.println("3) Main cabin class SOLD OUT!");
-            flightLog.get(flightID).setMainCabinClassSoldOut(true);
-          }
-          System.out.println("4) EXIT\n" + "\nPlease type option number:");
-
-          while(verifyMenuOption){ //Verify customer's option input
-            System.out.print("Enter option: ");
-            try {
-              ticketOption = Integer.parseInt(userInput.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("\n* Please enter a valid integer for the Flight ID *");
-            }
-            if(ticketOption == 1 && flightLog.get(flightID).isFirstClassSoldOut()){
-              System.out.println("\nFirst class SOLD OUT!");
-            }
-            else if (ticketOption == 2 && flightLog.get(flightID).isBusinessClassSoldOut()){
-              System.out.println("\nBusiness class SOLD OUT!");
-
-            }
-            else if (ticketOption == 3 && flightLog.get(flightID).isMainCabinClassSoldOut()){
-              System.out.println("\nMain cabin class SOLD OUT!");
-            }
-            else if(ticketOption >= 1 && ticketOption <=4){
-              verifyMenuOption = false;
-            }
-            else{
-              System.out.println("That is not an option, Please try again.");
-            }
-
-          }
-
-          verifyInput = true; //reset to true for future inputs
-
-          if(currCustomer.getRole().equalsIgnoreCase("Employee") && !isEmployee){
-            System.out.println("\n* Remeber that you will get a 50% discount on First Class tickets and a 75% discount on all other ticket purchases * \n\n* Fees and taxes still apply *");
-          }
-
-          customerPurchaseOptions(flightLog.get(flightID), currCustomer, ticketOption, logFile, myWriter,csvWriter, ticketPurchaseHistory, userInput, ticketsBought, currCustomer.getRole()); //Select the number of purchase tickets
-
-          if(ticketOption != 4){ //Check if the user wanted to exit, the assumption is that maybe they pressed option 4 by mistake
+        }
+        
+      }
+      verifyInput = true;
+      isEmployee = true;
+      //******************************************** Customer ********************************************//
+      while(verifyInput && !isEmployee){ //Verify username and password for customer
+        if(currCustomer.getRole().equalsIgnoreCase("Customer")){
+          System.out.println("\nPlease login using your Username and Password");
+          System.out.print("Username: ");
+          userName = userInput.nextLine();
+          System.out.print("Password: ");
+          password = userInput.nextLine();
+          if(currCustomer.getUsername().equals(userName) && currCustomer.getPassword().equals(password)){
+            System.out.println("\nWelcome back " + currCustomer.getUsername());
             verifyInput = false;
           }
           else{
-            verifyMenuOption = true;
+            System.out.println("\nUsername or Password is incorret, Please try again.");
+          }
 
-            System.out.println("\nYou have selected option 4, would you like to exit out of the entire program (enter Y) or try again (enter N)?");
+        }
+        else{ //Employee is already logged in
+          verifyInput = false;
+        }
+      }
 
-            while (verifyMenuOption){ //Verify if customer really wants to exit the program
-              System.out.print("\nEnter option: ");
-              exitOption = userInput.nextLine();
-              if (exitOption.equalsIgnoreCase("Y")){
-                verifyInput = false;
-                verifyMenuOption = false;
-              }
-              else if (exitOption.equalsIgnoreCase("N")){
-                verifyMenuOption = false;
+      verifyInput = true; //reset to true for future inputs
 
-              }
-              else{
-                System.out.println("\nThat is not an option, please try again.");
-              }
+
+      int ticketOption = 0; //Option has not been selected
+
+
+      while(verifyInput && !isEmployee){ //Verify user input when accessing main menu 
+        
+        while(verifyInput){
+          System.out.println("\nPlease select an option before continuing.");
+          System.out.print("\n1) View tickets purchased. \n2) Cancel a ticket. \n3) View flights \n4) Log out\n");
+          int mainMenuOption = -1;
+          
+          System.out.print("\nEnter option: ");
+
+          try {
+            mainMenuOption = Integer.parseInt(userInput.nextLine());
+            verifyMenuOption = false;
+          } catch (NumberFormatException e) {
+              System.out.println("\n* Please enter a valid integer for the main menu *");
+          }
+          
+          if(mainMenuOption == 1){
+            if(ticketsBought.size() == 0){
+              System.out.println("\nIt seems that you have not bought any tickets yet.");
             }
-
-            verifyMenuOption = true;
-
-            }
-
-          verifyMenuOption = true;//reset to true for future inputs
-
-          if(exitOption.equalsIgnoreCase("Y")){
-
-          }else{
-            while(verifyMenuOption){ //verify if the customer wants to buy more tickets
-              System.out.println("\nWould you like to go back to main menu? Y/N");
-              System.out.print("Enter option: ");
-              String moreTickets = userInput.nextLine();
-              if (moreTickets.equalsIgnoreCase("N")){
-                verifyInput = false;
-                verifyMenuOption = false;
-              }
-              else if (moreTickets.equalsIgnoreCase("Y")){
-                verifyInput = true;
-                verifyMenuOption = false;
-              }
-              else{
-                System.out.println("\nThat was not an option. Please enter Y for YES or N for NO.");
-              }
-      
+            else{
+              System.out.println("\nHere is a list of all the ticket(s) bought.");
+              printTicketsBought(ticketsBought);
             }
           }
-          verifyMenuOption = true;
+          else if(mainMenuOption == 2){
+              if(ticketsBought.size() == 0){
+                System.out.println("\nYou cannot cancel a ticket since you have not bought one yet.");
+              }
+              else{
+                printTicketsBought(ticketsBought);
+                System.out.println("\nBased on this list which ticket do you want to cancel?");
+                System.out.println("\n* Please be aware that the MinerAirlines transaction fee WILL NOT be returned *");
+                System.out.print("\nEnter option: ");
+                int ticketCancel = Integer.parseInt(userInput.nextLine());
+                System.out.println("\nAre you sure you want to cancel ticket number: " + ticketCancel + ". Enter Y/N.");
+                while(verifyInput){
+                  System.out.print("Enter option: ");
+                  String verifyCancelTicket = userInput.nextLine();
+                  if(verifyCancelTicket.equalsIgnoreCase("Y")){
+                    cancelTicketMenu(ticketsBought, currCustomer, flightLog, ticketCancel - 1, myWriter);
+                    verifyInput = false;
+                  }
+                  else if(verifyCancelTicket.equalsIgnoreCase("N")){
+                    System.out.println("\nTicket was not canceled.");
+                    verifyInput = false;
+                  }
+                  else{
+                    System.out.println("\nThat was not an option please try again.");
+                  }
+                }
+                verifyInput = true;
+              }
+          }
+          else if(mainMenuOption == 3){
+            verifyInput = true; //reset to true for future inputs
+            flightID = -1;
+            String flightNumber = "";
+            String code = "";
+            String originCode = "";
+            String destinationCode = "";
+            boolean verifyID = true;
+            boolean verifyFlightNumber = true;
+            HashMap<Integer, Flight> flightsByCodes = new HashMap<Integer, Flight>();
+            
+            System.out.println("\nHow would you like to search for your flight?" +"\n\n- To search by Flight ID enter \"FLight ID\". " + "\n- To search by Flight Number enter \"Flight Number\"." 
+            + "\n- To search by Orgin/Destination Airport Code enter \"Codes\".");
+            while(verifyInput){
+              System.out.print("Enter option: ");
+              String searchOption = userInput.nextLine();
+              if (searchOption.equalsIgnoreCase("FLight ID")){
+                System.out.println("\nPlease enter the flight ID number, remember you can only purchace one ticket per transaction.");
+                while (verifyID) {
+                  System.out.print("Enter Flight ID: ");
+                  try {
+                      flightID = Integer.parseInt(userInput.nextLine());
+                      if (flightID > 0 && flightID < flightLog.size()) {
+                          verifyID = false;
+                      } else {
+                          System.out.println("\nInvalid Flight ID number please try again.");
+                      }
+                  } catch (NumberFormatException e) {
+                      System.out.println("\n* Please enter a valid integer for the Flight ID *");
+                  }
+                }
+                verifyInput = false;
+              } else if (searchOption.equalsIgnoreCase("FLight Number")){
+                System.out.println("\nPlease enter the flight number, remember you can only purchace one ticket per transaction.");
+                System.out.print("Enter Flight Number: ");
+                flightNumber = userInput.nextLine();
+                flightID = searchByFlightNumber(flightLog, flightNumber, userInput);
+                verifyInput = false;
+              } else if (searchOption.equalsIgnoreCase("Codes")){
+                
+                while(verifyInput){
+                  System.out.println("\nRemember you can only purchace one ticket per transaction.");
+                  System.out.println("\nPlease enter the origin code.");
+                  System.out.print("Enter origin code: ");
+                  originCode = userInput.nextLine();
+                  System.out.println("\nPlease enter the destination code.");
+                  System.out.print("Enter destination code: ");
+                  destinationCode = userInput.nextLine();
+                  flightsByCodes = flightsByCodes(flightLog, originCode, destinationCode);
+                  if (flightsByCodes.size() > 0){
+                    verifyInput = false;
+                    printFlightsByCodes(flightLog, originCode, destinationCode, userInput);
+                  }
+                  else{
+                    System.out.println("\n* Invalid Origin/Destination Code, Please try again *");
+                  }
+                }
+                System.out.println("\nBased on these flights shown, how would you like to select your flight?" + "\n- To search by Flight ID enter \"FLight ID\". " + "\n- To search by Flight Number enter \"Flight Number\".\n");
+                verifyInput = true;
+                while(verifyInput){
+                  System.out.print("\nEnter option: ");
+                  searchOption = userInput.nextLine();
+                  if (searchOption.equalsIgnoreCase("FLight ID")){
+                    System.out.println("\nPlease enter the flight ID number, remember you can only purchace one ticket per transaction.");
+                    while (verifyID) {
+                      System.out.print("Enter Flight ID: ");
+                      try {
+                          flightID = Integer.parseInt(userInput.nextLine());
+                          if (flightExistByID(flightsByCodes, flightID)) {
+                              verifyID = false;
+                          } else {
+                              System.out.println("\n* Invalid Flight ID number based on orgin code:" + originCode + " and destination code: " + destinationCode + " please enter a flight ID that matches the flights above *\n");
+                          }
+                      } catch (NumberFormatException e) {
+                          System.out.println("\n* Please enter a valid integer for the Flight ID *");
+                      }
+                    }
+                    verifyInput = false;
+                  } else if (searchOption.equalsIgnoreCase("FLight Number")){
+                    System.out.println("\nPlease enter the flight number, remember you can only purchace one ticket per transaction.");
+                    System.out.print("Enter Flight Number: ");
+                    flightNumber = userInput.nextLine();
+                    flightID = searchByFlightNumber(flightsByCodes, flightNumber, userInput);
+                    verifyInput = false;
+                  } else{
+                    System.out.println("\n* That was not an option please try again *");
+                  }
+                }
+              } else{
+                  System.out.println("\n* That was not an option please try again *");
+              }
+            }
+            verifyInput = true; //reset to true for future inputs
+            verifyID = true;
+            verifyFlightNumber = true;
+            verifyMenuOption = true;
+            
+            System.out.println("\nHere is the flight's information that you have choosen.\n");
+            flightLog.get(flightID).printFlight();
+            if(flightLog.get(flightID).isInternational()){         //Check if this flight has a surcharge
+              System.out.println("\nThe flight that you have choosen has an international destination, there will be an extra $" + flightLog.get(flightID).getSurcharge() +
+              " PER SEAT that you purchase.");
+            }
+            System.out.println("\nHere is your available balance and the different ticket prices of Flight ID: " + flightID);
+            System.out.print("\nYour available balance is: "); // + currCustomer.getMoneyAvailable()); ///fix format of money
+            System.out.printf("%.2f", currCustomer.getMoneyAvailable());
+            if(flightLog.get(flightID).getFirstClassSeats() > 0){
+              System.out.println("\n1) First class price: " + flightLog.get(flightID).getFirstClassPrice());
+            }
+            else{
+              System.out.println("\n1) First class SOLD OUT!");
+              flightLog.get(flightID).setFirstClassSoldOut(true);
+            }
+            if(flightLog.get(flightID).getBusinessClassSeats() > 0){
+              System.out.println("2) Business class price: " + flightLog.get(flightID).getBusinessClassPrice());
+            }
+            else{
+              System.out.println("2) Business class SOLD OUT!");
+              flightLog.get(flightID).setBusinessClassSoldOut(true);
+            }
+            if(flightLog.get(flightID).getMainCabinSeats() > 0){
+              System.out.println("3) Main cabin price: " + flightLog.get(flightID).getMainCabinPrice());
+            }
+            else{
+              System.out.println("3) Main cabin class SOLD OUT!");
+              flightLog.get(flightID).setMainCabinClassSoldOut(true);
+            }
+            System.out.println("4) EXIT\n" + "\nPlease type option number:");
+
+            while(verifyMenuOption){ //Verify customer's option input
+              System.out.print("Enter option: ");
+              try {
+                ticketOption = Integer.parseInt(userInput.nextLine());
+              } catch (NumberFormatException e) {
+                  System.out.println("\n* Please enter a valid integer for the Flight ID *");
+              }
+              if(ticketOption == 1 && flightLog.get(flightID).isFirstClassSoldOut()){
+                System.out.println("\nFirst class SOLD OUT!");
+              }
+              else if (ticketOption == 2 && flightLog.get(flightID).isBusinessClassSoldOut()){
+                System.out.println("\nBusiness class SOLD OUT!");
+
+              }
+              else if (ticketOption == 3 && flightLog.get(flightID).isMainCabinClassSoldOut()){
+                System.out.println("\nMain cabin class SOLD OUT!");
+              }
+              else if(ticketOption >= 1 && ticketOption <=4){
+                verifyMenuOption = false;
+              }
+              else{
+                System.out.println("That is not an option, Please try again.");
+              }
+
+            }
+
+            verifyInput = true; //reset to true for future inputs
+
+            if(currCustomer.getRole().equalsIgnoreCase("Employee") && !isEmployee){
+              System.out.println("\n* Remeber that you will get a 50% discount on First Class tickets and a 75% discount on all other ticket purchases * \n\n* Fees and taxes still apply *");
+            }
+
+            customerPurchaseOptions(flightLog.get(flightID), currCustomer, ticketOption, logFile, myWriter,csvWriter, ticketPurchaseHistory, userInput, ticketsBought, currCustomer.getRole()); //Select the number of purchase tickets
+
+            if(ticketOption != 4){ //Check if the user wanted to exit, the assumption is that maybe they pressed option 4 by mistake
+              verifyInput = false;
+            }
+            else{
+              verifyMenuOption = true;
+
+              System.out.println("\nYou have selected option 4, would you like to exit out of the entire program (enter Y) or try again (enter N)?");
+
+              while (verifyMenuOption){ //Verify if customer really wants to exit the program
+                System.out.print("\nEnter option: ");
+                exitOption = userInput.nextLine();
+                if (exitOption.equalsIgnoreCase("Y")){
+                  verifyInput = false;
+                  verifyMenuOption = false;
+                }
+                else if (exitOption.equalsIgnoreCase("N")){
+                  verifyMenuOption = false;
+
+                }
+                else{
+                  System.out.println("\nThat is not an option, please try again.");
+                }
+              }
+
+              verifyMenuOption = true;
+
+              }
+
+            verifyMenuOption = true;//reset to true for future inputs
+
+            if(exitOption.equalsIgnoreCase("Y")){
+
+            }else{
+              while(verifyMenuOption){ //verify if the customer wants to buy more tickets
+                System.out.println();
+                System.out.println("\nWould you like to go back to main menu? Y/N (Selecting No will log you out)");
+                System.out.print("Enter option: ");
+                String moreTickets = userInput.nextLine();
+                if (moreTickets.equalsIgnoreCase("N")){
+                  verifyInput = false;
+                  verifyMenuOption = false;
+                }
+                else if (moreTickets.equalsIgnoreCase("Y")){
+                  verifyInput = true;
+                  verifyMenuOption = false;
+                }
+                else{
+                  System.out.println("\nThat was not an option. Please enter Y for YES or N for NO.");
+                }
+        
+              }
+            }
+            verifyMenuOption = true;
+          }
+          else if(mainMenuOption == 4){
+            verifyInput = false;
+          }
+          else{
+            System.out.println("\n* That was not an option please try again *");
+          }
         }
-        else if(mainMenuOption == 4){
-          verifyInput = false;
+        
+      }
+      while(verifySystemTerminate){
+        System.out.println("\n* Would you like to log in as a new person or exit out of the program? Type \"New Person\" or \"Exit\" *");
+        System.out.print("Enter option: ");
+        String answer = userInput.nextLine();
+        if(answer.equalsIgnoreCase("New Person")){
+          verifySystemTerminate = false;
+        }
+        else if(answer.equalsIgnoreCase("Exit")){
+          verifySystemTerminate = false;
+          systemISRunning = false;
         }
         else{
           System.out.println("\n* That was not an option please try again *");
         }
       }
-      
+      verifySystemTerminate = true;
+
     }
     writeUpdatedCustomerFile(customerLog,updateCustomerLog);
     writeUpdatedFlightScheduleFile(flightLog, updatedFlightScheduleLog,updateFlightLog);
-    System.out.println("\nThank you for using our system " + currCustomer.getUsername() + " have a nice day!\n");
+    System.out.println("\nThank you for using our system have a nice day!\nCheck log file for information.");
     myWriter.close();
     csvWriter.close();
     cancelFlightCsv.close();
     updateCustomerLog.close();
     updateFlightLog.close();
-    printLog(logFile); //Print out all changes/purcheses that were made
+    summary.close();
+    //printLog(logFile); //Print out all changes/purcheses that were made * DO NOT PRINT the auto buyer crashes system, too many print statements *
       
     }
     //********************************* Methods *************************************//
@@ -580,323 +643,333 @@ public class RunFlight {
                                       + "9 - Main Cabin Price\n" + "10 - View customers on this flight and flight revenue\n"
                                       + "11 - cancel current flight\n" + "12 - Make no changes\n");
           //changeInfo = userInput.nextLine();
-          while(verifyInput){
-            System.out.print("Enter option below: ");
-            changeInfo = userInput.nextLine();
-            try {
-                int option = Integer.parseInt(changeInfo);
-                if (option < 1 || option > 12) {
-                    System.out.println("\n* That was not an option please try again *");
-                } else {
-                    verifyInput = false;
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("\n* That was not an option please try again *");
-            }
+        while(verifyInput){
+          System.out.print("Enter option below: ");
+          changeInfo = userInput.nextLine();
+          try {
+              int option = Integer.parseInt(changeInfo);
+              if (option < 1 || option > 12) {
+                  System.out.println("\n* That was not an option please try again *");
+              } else {
+                  verifyInput = false;
+              }
+          } catch (NumberFormatException e) {
+              System.out.println("\n* That was not an option please try again *");
           }
-
-          verifyInput = true;
-          switch(Integer.parseInt(changeInfo)){
-              case 1: //Origin Airport change
-                  System.out.println("\nWhat is the new Origin Airport:");
-                  System.out.print("Enter new airport: ");
-                  newChange = userInput.nextLine();
-                  currFlightObj.setOriginAirport(newChange);
-                  System.out.println("\nChange was succesful! here is the new information.\n");
-                  currFlightObj.printFlight();
-                  try {
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated origin airport to " + currFlightObj.getOriginAirport() +"\n");
-                      myWriter.write("\n");
-                    } catch (IOException e) {
-                      System.out.println("\nAn error occurred while writting to file!");
-                      e.printStackTrace();
-                    }
-                  
-                  break;
-              case 2: //Origin Code change
-                  System.out.println("\nWhat is the new Origin Code:");
-                  System.out.print("Enter new code: ");
-                  newChange = userInput.nextLine();
-                  currFlightObj.setOriginCode(newChange);
-                  System.out.println("\nChange was succesful! here is the new information.\n");
-                  currFlightObj.printFlight();
-                  try {
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated origin code to " + currFlightObj.getOriginCode() + "\n");
-                      myWriter.write("\n");
-                    } catch (IOException e) {
-                      System.out.println("\nAn error occurred while writting to file!");
-                      e.printStackTrace();
-                    }
-  
-                  break;
-              case 3: //Destination Airport change
-                  System.out.println("\nWhat is the new Destination Airport:");
-                  System.out.print("Enter new airport: ");
-                  newChange = userInput.nextLine();
-                  currFlightObj.setDestinationAirport(newChange);
-                  System.out.println("\nChange was succesful! here is the new information.\n");
-                  currFlightObj.printFlight();
-                  try {
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated destination airport to " + currFlightObj.getDestinationAirport() + "\n");
-                      myWriter.write("\n");
-                    } catch (IOException e) {
-                      System.out.println("\nAn error occurred while writting to file!");
-                      e.printStackTrace();
-                    }
-  
-                  break;
-              case 4: //Destination Code change
-                  System.out.println("\nWhat is the new Destination Code:");
-                  System.out.print("Enter new code: ");
-                  newChange = userInput.nextLine();
-                  currFlightObj.setDestinationCode(newChange);
-                  System.out.println("\nChange was succesful! here is the new information.\n");
-                  currFlightObj.printFlight();
-                  try {
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated destination code to " + currFlightObj.getDestinationCode() + "\n");
-                      myWriter.write("\n");
-                    } catch (IOException e) {
-                      System.out.println("\nAn error occurred while writting to file!");
-                      e.printStackTrace();
-                    }
-  
-                  break;
-              case 5: //Departure Date change
-                  System.out.println("\nWhat is the new Departure Date in MM/DD/YYYY:");
-                  System.out.print("Enter new date: ");
-                  newChange = userInput.nextLine();
-                  currFlightObj.changeDepartureDate(newChange);; //CHANGE ARRIVAL TIME
-                  System.out.println("\nChange was succesful! here is the new information.\n");
-                  currFlightObj.printFlight();
-                  try {
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated departure date to " + currFlightObj.getDepartureDate() + "\n");
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated arrival date to " + currFlightObj.getArrivalDate() + "\n");
-                      myWriter.write("\n");
-                    } catch (IOException e) {
-                      System.out.println("\nAn error occurred while writting to file!");
-                      e.printStackTrace();
-                    }
-  
-                  break;
-              case 6: //Departure Time change
-                  System.out.println("\nWhat is the new Departure Time in HH:MM (military time):");
-                  System.out.print("Enter new time: ");
-                  newChange = userInput.nextLine();
-                  currFlightObj.changeDepartureTime(newChange);//CHANGE ARRIVAL TIME
-                  System.out.println("\nChange was succesful! here is the new information.\n");
-                  currFlightObj.printFlight();
-                  try {
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated departure time to " + currFlightObj.getDepartureTime() +", new arrival time is "+ currFlightObj.getArrivalTime() +"\n"); //CHANGE
-                      myWriter.write("\n");
-                    } catch (IOException e) {
-                      System.out.println("\nAn error occurred while writting to file!");
-                      e.printStackTrace();
-                    }
-  
-                  break;
-              case 7: //First Class Price change
-                  System.out.println("\nWhat is the new First Class Price:");
-                  System.out.print("Enter new price: ");
-                  newChange = userInput.nextLine();
-                  currFlightObj.setFirstClassPrice(Integer.parseInt(newChange));
-                  System.out.println("\nChange was succesful! here is the new information.\n");
-                  currFlightObj.printFlight();
-                  try {
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated first class price to " + currFlightObj.getFirstClassPrice() +"\n");
-                      myWriter.write("\n");
-                    } catch (IOException e) {
-                      System.out.println("\nAn error occurred while writting to file!");
-                      e.printStackTrace();
-                    }
-  
-                  break;
-              case 8: //Business Class Price change
-                  System.out.println("\nWhat is the new Business Class Price:");
-                  System.out.print("Enter new price: ");
-                  newChange = userInput.nextLine();
-                  currFlightObj.setBusinessClassPrice(Integer.parseInt(newChange));
-                  System.out.println("\nChange was succesful! here is the new information.\n");
-                  currFlightObj.printFlight();
-                  try {
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated business class price to " + currFlightObj.getBusinessClassPrice() + "\n");
-                      myWriter.write("\n");
-                    } catch (IOException e) {
-                      System.out.println("\nAn error occurred while writting to file!");
-                      e.printStackTrace();
-                    }
-  
-                  break;
-              case 9: //Main Cabin Price change
-                  System.out.println("\nWhat is the new Main Class Price:");
-                  System.out.print("Enter new price: ");
-                  newChange = userInput.nextLine();
-                  currFlightObj.setMainCabinPrice(Integer.parseInt(newChange));
-                  System.out.println("\nChange was succesful! here is the new information.\n");
-                  currFlightObj.printFlight();
-                  try {
-                      myWriter.write("Flight ID: " + currFlightObj.getID() + " updated main cabin price to " + currFlightObj.getMainCabinPrice() +"\n");
-                      myWriter.write("\n");
-                    } catch (IOException e) {
-                      System.out.println("\nAn error occurred while writting to file!");
-                      e.printStackTrace();
-                    }
-  
-                  break;
-              case 10: //View customers on this flight
-                  boolean customerTicketFound = false;
-                  int routeCost = currFlightObj.getRouteCost();
-                  int currProfit = 0;
-                  int totalProfit = 0;
-                  int tickestBoughtIdx = 0;
-                  int totalSeatsSold = 0;
-                  int firstClassSeatsSold = 0;
-                  int businessClassSeatsSold = 0;
-                  int mainCabinClassSeatsSold = 0;
-                  for(int i = 0; i < ticketsBought.size(); i++){
-                    if(currFlightObj.getID() == ticketsBought.get(i).getID()){
-                      customerTicketFound = true;
-                      tickestBoughtIdx = i;
-                      if(customerTicketFound){
-                        System.out.println("\n" + ticketsBought.get(tickestBoughtIdx).getTicketFirstName() + " " + ticketsBought.get(tickestBoughtIdx).getTickeLastName());
-                        System.out.println(ticketsBought.get(tickestBoughtIdx).getClassType() + ": " + ticketsBought.get(tickestBoughtIdx).getNumberOfSeats() + " seats");
-                        System.out.println("Total Price: $" +ticketsBought.get(tickestBoughtIdx).getClassCost());
-    
-                        if(ticketsBought.get(tickestBoughtIdx).getClassType().equalsIgnoreCase("First Class")){
-                          firstClassSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
-                          totalSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
-                          currProfit += ticketsBought.get(tickestBoughtIdx).getClassCost();
-                        }
-                        else if(ticketsBought.get(tickestBoughtIdx).getClassType().equalsIgnoreCase("Business Class")){
-                          businessClassSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
-                          totalSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
-                          currProfit += ticketsBought.get(tickestBoughtIdx).getClassCost();
-                        }
-                        else{
-                          mainCabinClassSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
-                          totalSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
-                          currProfit += ticketsBought.get(tickestBoughtIdx).getClassCost();
-                        }
-    
-                      }
-                      //customerTicketFound = false; //reset
-                    }
+        }
+        verifyInput = true;
+        switch(Integer.parseInt(changeInfo)){
+            case 1: //Origin Airport change
+                System.out.println("\nWhat is the new Origin Airport:");
+                System.out.print("Enter new airport: ");
+                newChange = userInput.nextLine();
+                currFlightObj.setOriginAirport(newChange);
+                System.out.println("\nChange was succesful! here is the new information.\n");
+                currFlightObj.printFlight();
+                try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated origin airport to " + currFlightObj.getOriginAirport() +"\n");
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
                   }
-                  totalProfit = currProfit - routeCost;
-                  if(!customerTicketFound){
-                    System.out.println("\nNo one has bought any tickets for this flight yet.");
-                    System.out.println("\nFirst Class seats sold: 0");
-                    System.out.println("\nBusiness Class seats sold: 0");
-                    System.out.println("\nMain Cabin Class seats sold: 0");
-                    System.out.println("\n\nCurrent Total profit: $" + totalProfit);
-                    
-                  }
-                  else{
-                    System.out.println("\nNumber of seats sold: " + totalSeatsSold);
-                    System.out.println("\nFirst Class seats sold: " + firstClassSeatsSold);
-                    System.out.println("\nBusiness Class seats sold: " + businessClassSeatsSold);
-                    System.out.println("\nMain Cabin Class seats sold: " + mainCabinClassSeatsSold);
-                    System.out.println("\nCurrent Total profit: $" + totalProfit);
-                  }
-                  try {
-                    myWriter.write("Employer view customer list and revenue for flight ID: " + currFlightObj.getID());
+                
+                break;
+            case 2: //Origin Code change
+                System.out.println("\nWhat is the new Origin Code:");
+                System.out.print("Enter new code: ");
+                newChange = userInput.nextLine();
+                currFlightObj.setOriginCode(newChange);
+                System.out.println("\nChange was succesful! here is the new information.\n");
+                currFlightObj.printFlight();
+                try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated origin code to " + currFlightObj.getOriginCode() + "\n");
                     myWriter.write("\n");
                   } catch (IOException e) {
                     System.out.println("\nAn error occurred while writting to file!");
                     e.printStackTrace();
                   }
 
-                  break;
-              case 11: //Cancel current flight
-                  System.out.println("\n* WARNING * by canceling this flight you understand that:\n"
-                   + "\n1) All ticket sales will be returned to the customers.\n" + "2) This flight will no longer be available to sell tickets.\n"
-                   + "\nPlease enter Y indicating that you understand these conditions, or N to not cancel this flight.");
-                   while (cancelFlightInput){
-                    System.out.print("Enter option: ");
-                    String cancelTicket = userInput.nextLine();
-                    if(cancelTicket.equalsIgnoreCase("Y")){
-                      try {
-                        csvWriter.write(currFlightObj.getID() + "," + "CANCELED");
-                        csvWriter.write("\n");
-                      } catch (IOException e) {
-                        System.out.println("\nAn error occurred while writting to file!");
-                        e.printStackTrace();
-                      }
-                      boolean foundTicket = false;
-                      int i = 0;
-                      tickestBoughtIdx = 0;
-
-                      while(i < ticketsBought.size()){ //Generates information about the customer
-                          if(currFlightObj.getID() == ticketsBought.get(i).getID()){
-                            foundTicket = true;
-                            if(foundTicket){
-                              float totalTicketCostReturn = ticketsBought.get(tickestBoughtIdx).getClassCost(); //100% refund
-                              String customerFirstNmae = ticketsBought.get(tickestBoughtIdx).getTicketFirstName();
-                              String customerLastName = ticketsBought.get(tickestBoughtIdx).getTickeLastName();
-                              ticketRefund(customerLog, customerFirstNmae, customerLastName, totalTicketCostReturn);
-                              ticketsBought.get(tickestBoughtIdx).setStatus("CANCELED");
-                              System.out.println("\nSystem has refunded $" + totalTicketCostReturn + " to " + customerFirstNmae + " " + customerLastName + " and status of the tickets was changed to CANCELED.");
-                              try {
-                                myWriter.write("System has refunded $" + totalTicketCostReturn + " to " + customerFirstNmae + " " + customerLastName + " and status of the tickets was changed to CANCELED.");
-                                myWriter.write("\n");
-                              } catch (IOException e) {
-                                System.out.println("\nAn error occurred while writting to file!");
-                                e.printStackTrace();
-                              }
-                            }
-                            else{
-                              System.out.println("\nNo one has bought a ticket for this flight, therefore no money was returned.");
-                            }
-                          }
-                          i++;
-                          tickestBoughtIdx++;
-                      }
-                      cancelFlightInput = false;
-                    }
-                    else if (cancelTicket.equalsIgnoreCase("N")){
-                      System.out.println("\nFlight ID: " + currFlightObj.getID() + " was NOT canceled.");
-                      try {
-                        myWriter.write("Flight ID: " + currFlightObj.getID() + " was NOT canceled.");
-                        myWriter.write("\n");
-                      } catch (IOException e) {
-                        System.out.println("\nAn error occurred while writting to file!");
-                        e.printStackTrace();
-                      }
-                      cancelFlightInput = false;
-                    }
-                    else {
-                      System.out.println("\nThat was not an option please try again.");
-                    }
+                break;
+            case 3: //Destination Airport change
+                System.out.println("\nWhat is the new Destination Airport:");
+                System.out.print("Enter new airport: ");
+                newChange = userInput.nextLine();
+                currFlightObj.setDestinationAirport(newChange);
+                System.out.println("\nChange was succesful! here is the new information.\n");
+                currFlightObj.printFlight();
+                try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated destination airport to " + currFlightObj.getDestinationAirport() + "\n");
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
                   }
 
-                  break;
-              case 12: //No change
-                  System.out.println("\nNo changes were made.");
+                break;
+            case 4: //Destination Code change
+                System.out.println("\nWhat is the new Destination Code:");
+                System.out.print("Enter new code: ");
+                newChange = userInput.nextLine();
+                currFlightObj.setDestinationCode(newChange);
+                System.out.println("\nChange was succesful! here is the new information.\n");
+                currFlightObj.printFlight();
+                try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated destination code to " + currFlightObj.getDestinationCode() + "\n");
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
+                  }
+
+                break;
+            case 5: //Departure Date change
+                System.out.println("\nWhat is the new Departure Date in MM/DD/YYYY:");
+                System.out.print("Enter new date: ");
+                newChange = userInput.nextLine();
+                currFlightObj.changeDepartureDate(newChange);; //CHANGE ARRIVAL TIME
+                System.out.println("\nChange was succesful! here is the new information.\n");
+                currFlightObj.printFlight();
+                try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated departure date to " + currFlightObj.getDepartureDate() + "\n");
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated arrival date to " + currFlightObj.getArrivalDate() + "\n");
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
+                  }
+
+                break;
+            case 6: //Departure Time change
+                System.out.println("\nWhat is the new Departure Time in HH:MM (military time):");
+                System.out.print("Enter new time: ");
+                newChange = userInput.nextLine();
+                currFlightObj.changeDepartureTime(newChange);//CHANGE ARRIVAL TIME
+                System.out.println("\nChange was succesful! here is the new information.\n");
+                currFlightObj.printFlight();
+                try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated departure time to " + currFlightObj.getDepartureTime() +", new arrival time is "+ currFlightObj.getArrivalTime() +"\n"); //CHANGE
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
+                  }
+
+                break;
+            case 7: //First Class Price change
+                System.out.println("\nWhat is the new First Class Price:");
+                System.out.print("Enter new price: ");
+                newChange = userInput.nextLine();
+                currFlightObj.setFirstClassPrice(Integer.parseInt(newChange));
+                System.out.println("\nChange was succesful! here is the new information.\n");
+                currFlightObj.printFlight();
+                try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated first class price to " + currFlightObj.getFirstClassPrice() +"\n");
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
+                  }
+
+                break;
+            case 8: //Business Class Price change
+                System.out.println("\nWhat is the new Business Class Price:");
+                System.out.print("Enter new price: ");
+                newChange = userInput.nextLine();
+                currFlightObj.setBusinessClassPrice(Integer.parseInt(newChange));
+                System.out.println("\nChange was succesful! here is the new information.\n");
+                currFlightObj.printFlight();
+                try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated business class price to " + currFlightObj.getBusinessClassPrice() + "\n");
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
+                  }
+
+                break;
+            case 9: //Main Cabin Price change
+                System.out.println("\nWhat is the new Main Class Price:");
+                System.out.print("Enter new price: ");
+                newChange = userInput.nextLine();
+                currFlightObj.setMainCabinPrice(Integer.parseInt(newChange));
+                System.out.println("\nChange was succesful! here is the new information.\n");
+                currFlightObj.printFlight();
+                try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " updated main cabin price to " + currFlightObj.getMainCabinPrice() +"\n");
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
+                  }
+
+                break;
+            case 10: //View customers on this flight
+                boolean customerTicketFound = false;
+                int routeCost = currFlightObj.getRouteCost();
+                int currProfit = 0;
+                int totalProfit = 0;
+                int tickestBoughtIdx = 0;
+                int totalSeatsSold = 0;
+                int firstClassSeatsSold = 0;
+                int businessClassSeatsSold = 0;
+                int mainCabinClassSeatsSold = 0;
+                for(int i = 0; i < ticketsBought.size(); i++){
+                  if(currFlightObj.getID() == ticketsBought.get(i).getID()){
+                    customerTicketFound = true;
+                    tickestBoughtIdx = i;
+                    if(customerTicketFound){
+                      System.out.println("\n" + ticketsBought.get(tickestBoughtIdx).getTicketFirstName() + " " + ticketsBought.get(tickestBoughtIdx).getTickeLastName());
+                      System.out.println(ticketsBought.get(tickestBoughtIdx).getClassType() + ": " + ticketsBought.get(tickestBoughtIdx).getNumberOfSeats() + " seats");
+                      System.out.println("Total Price: $" +ticketsBought.get(tickestBoughtIdx).getClassCost());
+  
+                      if(ticketsBought.get(tickestBoughtIdx).getClassType().equalsIgnoreCase("First Class")){
+                        firstClassSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
+                        totalSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
+                        currProfit += ticketsBought.get(tickestBoughtIdx).getClassCost();
+                      }
+                      else if(ticketsBought.get(tickestBoughtIdx).getClassType().equalsIgnoreCase("Business Class")){
+                        businessClassSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
+                        totalSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
+                        currProfit += ticketsBought.get(tickestBoughtIdx).getClassCost();
+                      }
+                      else{
+                        mainCabinClassSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
+                        totalSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
+                        currProfit += ticketsBought.get(tickestBoughtIdx).getClassCost();
+                      }
+  
+                    }
+                    //customerTicketFound = false; //reset
+                  }
+                }
+                totalProfit = currProfit - routeCost;
+                if(!customerTicketFound){
+                  System.out.println("\nNo one has bought any tickets for this flight yet.");
+                  System.out.println("\nFirst Class seats sold: 0");
+                  System.out.println("\nBusiness Class seats sold: 0");
+                  System.out.println("\nMain Cabin Class seats sold: 0");
+                  System.out.println("\n\nCurrent Total profit: $" + totalProfit);
+                  
+                }
+                else{
+                  System.out.println("\nNumber of seats sold: " + totalSeatsSold);
+                  System.out.println("\nFirst Class seats sold: " + firstClassSeatsSold);
+                  System.out.println("\nBusiness Class seats sold: " + businessClassSeatsSold);
+                  System.out.println("\nMain Cabin Class seats sold: " + mainCabinClassSeatsSold);
+                  System.out.println("\nCurrent Total profit: $" + totalProfit);
+                }
+                try {
+                  myWriter.write("Employer view customer list and revenue for flight ID: " + currFlightObj.getID());
+                  myWriter.write("\n");
+                } catch (IOException e) {
+                  System.out.println("\nAn error occurred while writting to file!");
+                  e.printStackTrace();
+                }
+
+                break;
+            case 11: //Cancel current flight
+                System.out.println("\n* WARNING * by canceling this flight you understand that:\n"
+                  + "\n1) All ticket sales will be returned to the customers.\n" + "2) This flight will no longer be available to sell tickets.\n"
+                  + "\nPlease enter Y indicating that you understand these conditions, or N to not cancel this flight.");
+                while (cancelFlightInput){
+                System.out.print("Enter option: ");
+                String cancelTicket = userInput.nextLine();
+                if(cancelTicket.equalsIgnoreCase("Y")){
                   try {
-                      myWriter.write("No changes were made");
+                    csvWriter.write(currFlightObj.getID() + "," + "CANCELED");
+                    csvWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
+                  }
+                  boolean foundTicket = false;
+                  int i = 0;
+                  tickestBoughtIdx = 0;
+
+                  while(i < ticketsBought.size()){ //Generates information about the customer
+                    if(currFlightObj.getID() == ticketsBought.get(i).getID()){
+                      foundTicket = true;
+                      if(foundTicket){
+                        float totalTicketCostReturn = ticketsBought.get(tickestBoughtIdx).getClassCost(); //100% refund
+                        String customerFirstNmae = ticketsBought.get(tickestBoughtIdx).getTicketFirstName();
+                        String customerLastName = ticketsBought.get(tickestBoughtIdx).getTickeLastName();
+                        ticketRefund(customerLog, customerFirstNmae, customerLastName, totalTicketCostReturn);
+                        ticketsBought.get(tickestBoughtIdx).setStatus("CANCELED");
+                        System.out.println("\nSystem has refunded $" + totalTicketCostReturn + " to " + customerFirstNmae + " " + customerLastName + " and status of the tickets was changed to CANCELED.");
+                        try {
+                          myWriter.write("System has refunded $" + totalTicketCostReturn + " to " + customerFirstNmae + " " + customerLastName + " and status of the tickets was changed to CANCELED.");
+                          myWriter.write("\n");
+                        } catch (IOException e) {
+                          System.out.println("\nAn error occurred while writting to file!");
+                          e.printStackTrace();
+                        }
+                      }
+                      else{
+                        System.out.println("\nNo one has bought a ticket for this flight, therefore no money was returned.");
+                        try {
+                          myWriter.write("No money was refunded since no one bought tickets for this flight and the status of the tickets was changed to CANCELED.");
+                          myWriter.write("\n");
+                        } catch (IOException e) {
+                          System.out.println("\nAn error occurred while writting to file!");
+                          e.printStackTrace();
+                        }
+                      }
+                    }
+                    i++;
+                    tickestBoughtIdx++;
+                  }
+                  if (ticketsBought.size() == 0){
+                    System.out.println("\nNo one has bought a ticket for this flight, therefore no money was returned.");
+                    try {
+                      myWriter.write("No money was refunded since no one bought tickets for this flight and the status of the tickets was changed to CANCELED.");
                       myWriter.write("\n");
                     } catch (IOException e) {
                       System.out.println("\nAn error occurred while writting to file!");
                       e.printStackTrace();
                     }
-                  break;
-              default:
-                  System.out.print("Invalid input, please select a proper option!\n");
-                  
-          }
+                  }
+                  cancelFlightInput = false;
+                }else if (cancelTicket.equalsIgnoreCase("N")){
+                  System.out.println("\nFlight ID: " + currFlightObj.getID() + " was NOT canceled.");
+                  try {
+                    myWriter.write("Flight ID: " + currFlightObj.getID() + " was NOT canceled.");
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
+                  }
+                  cancelFlightInput = false;
+                }else {
+                  System.out.println("\nThat was not an option please try again.");
+                }
+              }
+                break;
+            case 12: //No change
+                System.out.println("\nNo changes were made.");
+                try {
+                    myWriter.write("No changes were made");
+                    myWriter.write("\n");
+                  } catch (IOException e) {
+                    System.out.println("\nAn error occurred while writting to file!");
+                    e.printStackTrace();
+                  }
+                break;
+            default:
+                System.out.print("Invalid input, please select a proper option!\n");
+                
+        }
 
-          System.out.println("\nWould you like to make another change on Flight ID " +currFlightObj.getID() + "? [Y,N]");
-          System.out.print("Enter option: ");
-          question = userInput.nextLine(); // flush
-          if(question.equalsIgnoreCase("y")){
-              System.out.println("Here is the menu again.\n");
+        System.out.println("\nWould you like to make another change on Flight ID " +currFlightObj.getID() + "? [Y,N]");
+        System.out.print("Enter option: ");
+        question = userInput.nextLine(); // flush
+        if(question.equalsIgnoreCase("y")){
+            System.out.println("Here is the menu again.\n");
+        }else{
+            verifyInput = false;
           }
-          else{
-              verifyInput = false;
-          }
-
-      }
-      
-  }
+        }
+    }
     /**
      * 
      * @param fileName This variable will have the String name of the log file that you want the scanner to read and print the changes what were recorded.
@@ -911,7 +984,7 @@ public class RunFlight {
           System.out.println(currLine);
 
       }
-  }
+    }
     /**
      * 
      * @param flightSchedule This variable will have the String name of the file where all of the flight's information is stored.
@@ -1150,13 +1223,14 @@ public class RunFlight {
      * @param firstName This variable will have the String first name of the current customer.
      * @param lastName This variable will have the String last name of the current customer.
      * @return This method will return the current customer object.
+     * 
      */
     public static Customer findCustomerObj(HashMap<Integer,Customer> customerLog, String firstName, String lastName){
       int i = 1;
 
       Customer currCustomer = new Customer();
 
-      while(i < customerLog.size()){
+      while(i < customerLog.size() + 1){
         if(customerLog.get(i).getFirstName().equalsIgnoreCase(firstName) && customerLog.get(i).getLastName().equalsIgnoreCase(lastName)){
           currCustomer = customerLog.get(i);
         }
@@ -1210,6 +1284,7 @@ public class RunFlight {
       double membershipSaving = 0.0;
       double membershipTotalSaving = 0.0;
       double discountPrice = 0.0;
+      double totalCollectedAirportFees = 0.0;
 
       boolean validInput = true;
       boolean checkTickets = true;
@@ -1311,7 +1386,9 @@ public class RunFlight {
 
             currCustomer.setFlightsPurchased(ticketsPurchase);
             firstClassRevenue += ticketsPurchasePrice - (ticketsPurchasePrice * MEMBERSHIP_DISCOUNT)  - salesTax - securityFee;
+            totalCollectedAirportFees += currFlight.getOrginAirportFee() + currFlight.getDestinationAirportFee();
             currFlight.setFirstClassRevenue(firstClassRevenue);
+            currFlight.setAirportCollectedFees(totalCollectedAirportFees);
 
             if (currFlight.isInternational()){
               System.out.println("\n\nHere is the total surcharge that was added to your bill: $" + surchargePerSeat);
@@ -1471,7 +1548,9 @@ public class RunFlight {
 
             currCustomer.setFlightsPurchased(ticketsPurchase);
             businessClassRevenue += ticketsPurchasePrice - (ticketsPurchasePrice * MEMBERSHIP_DISCOUNT)  - salesTax - securityFee;
+            totalCollectedAirportFees += currFlight.getOrginAirportFee() + currFlight.getDestinationAirportFee();
             currFlight.setBusinessClassRevenue(businessClassRevenue);
+            currFlight.setAirportCollectedFees(totalCollectedAirportFees);
 
             if (currFlight.isInternational()){
               System.out.println("\n\nHere is the total surcharge that was added to your bill: $" + surchargePerSeat);
@@ -1634,7 +1713,9 @@ public class RunFlight {
 
             currCustomer.setFlightsPurchased(ticketsPurchase);
             mainCabinClassRevenue += ticketsPurchasePrice - (ticketsPurchasePrice * MEMBERSHIP_DISCOUNT)  - salesTax - securityFee;
+            totalCollectedAirportFees += currFlight.getOrginAirportFee() + currFlight.getDestinationAirportFee();
             currFlight.setMainCabinClassRevenue(mainCabinClassRevenue);
+            currFlight.setAirportCollectedFees(totalCollectedAirportFees);
 
             if (currFlight.isInternational()){
               System.out.println("\n\nHere is the total surcharge that was added to your bill: $" + surchargePerSeat);
@@ -1965,7 +2046,13 @@ public class RunFlight {
       }
       return flightTypeList;
     }
-
+    /**
+     * 
+     * @param flightLog This variable will contain the HashMap that was created when using the flights() method.
+     * @param flightNumber This variable will contain the flight number of the current flight.
+     * @param userInput This variable will contain the scanner for the user inputs.
+     * @return This method will return the flight ID based on the flight number of the current flight.
+     */
     public static int searchByFlightNumber(HashMap<Integer, Flight> flightLog, String flightNumber, Scanner userInput){
       boolean verifyInput = true;
       int i = 1;
@@ -1984,7 +2071,13 @@ public class RunFlight {
       }
       return -1;
     }
-  
+    /**
+     * 
+     * @param flightLog This variable will contain the HashMap that was created when using the flights() method.
+     * @param originCode This variable will contain the origin code of the current flight.
+     * @param destinationCode This variable will contain the destination code of the current flight.
+     * @param userInput This variable will contain the scanner for the user inputs.
+     */
     public static void printFlightsByCodes(HashMap<Integer, Flight> flightLog, String originCode, String destinationCode, Scanner userInput){
       int i = 1;
       while(i < flightLog.size() + 1){
@@ -1995,7 +2088,13 @@ public class RunFlight {
           i++;
       }
     }
-
+    /**
+     * 
+     * @param flightLog This variable will contain the HashMap that was created when using the flights() method.
+     * @param originCode This variable will contain the origin code of the current flight.
+     * @param destinationCode This variable will contain the destination code of the current flight.
+     * @return This method will return a hashmap of all flights based on the origin and destination codes.
+     */
     public static HashMap<Integer,Flight> flightsByCodes(HashMap<Integer, Flight> flightLog, String originCode, String destinationCode){
       int i = 1;
       int flightIDX = 1;
@@ -2009,7 +2108,31 @@ public class RunFlight {
       }
       return flightsByCode;
     }
-
+    /**
+     * 
+     * @param flightLog This variable will contain the HashMap that was created when using the flights() method.
+     * @param originCode This variable will contain the origin code of the current flight.
+     * @return This method will return a hashmap of all flights based on the origin code.
+     */
+    public static HashMap<Integer,Flight> flightsByOriginCode(HashMap<Integer, Flight> flightLog, String originCode){
+      int i = 1;
+      int flightIDX = 1;
+      HashMap<Integer,Flight> flightsByCode = new HashMap<Integer, Flight>();
+      while(i < flightLog.size() + 1){
+          if(flightLog.get(i).getOriginCode().equalsIgnoreCase(originCode)){
+              flightsByCode.put(flightIDX, flightLog.get(i));
+              flightIDX++;
+          }
+          i++;
+      }
+      return flightsByCode;
+    }
+    /**
+     * 
+     * @param flightLog This variable will contain the HashMap that was created when using the flights() method.
+     * @param flightID This variable will contain the flight ID of the current flight.
+     * @return This method will return true or false of the flight exist.
+     */
     public static boolean flightExistByID(HashMap<Integer, Flight> flightLog, int flightID){
       int i = 1;
       while(i < flightLog.size() + 1){
@@ -2020,6 +2143,502 @@ public class RunFlight {
       }
       return false;
     }
+    /**
+     * 
+     * @param flightLog This variable will contain the HashMap that was created when using the flights() method.
+     */
+    public static void printFlightsEmployeeFormat(HashMap<Integer,Flight> flightLog){
+      for(int i = 1; i < flightLog.size() + 1; i++){
+        System.out.println("\n");
+        System.out.println("Code: " + flightLog.get(i).getOriginCode());
+        System.out.println("Flight ID: " + flightLog.get(i).getID());
+        System.out.println("Flight Number: " + flightLog.get(i).getFlightNum());
+        System.out.println("Airport Name: " + flightLog.get(i).getOriginAirport());
+        System.out.println("City: " + flightLog.get(i).getOriginAirportCity());
+        System.out.println("State: " + flightLog.get(i).getOriginAirportState());
+        System.out.println("Country: " + flightLog.get(i).getOriginAirportCountry());
+        System.out.println("Fees: " + flightLog.get(i).getOrginAirportFee());
+        System.out.println("Lounge Status:" + flightLog.get(i).isOriginAirportLounge());
+        System.out.print("Total Collected Airport Fees: ");
+        System.out.printf("%.2f", flightLog.get(i).getAirportCollectedFees());
+      }
+    }
 
+    public static void autoPurchaseTest(String autoFileName, HashMap<Integer,Flight> flightLog, HashMap<Integer,Customer> customerLog, FileWriter myWriter, FileWriter csvFileWriter, String csvFileName,String logfile, ArrayList<Ticket> tickestBought) throws IOException{
+      Scanner autoReader = new Scanner(new File(autoFileName));
 
+      String [] token;
+      String currLine;
+      String firstName = "";
+      String lastName = "";
+      String action = "";
+      int flightID = -1;
+      String originAirport = "";
+      String destinationAirport = "";
+      String ticketType = "";
+      int ticketQuantity = -1;
+      int classOption = -1;
+      HashMap<Integer, Flight> autoFlightLog = flightLog;
+      Flight currFlight = new Flight();
+      Customer currCustomer = new Customer();
+      autoReader.nextLine();
+      int i = 1;
+      while(autoReader.hasNext()){
+        currLine = autoReader.nextLine();
+        token = currLine.split(",");
+        firstName = token[0];
+        lastName = token[1];
+        action = token[2];
+        flightID = Integer.parseInt(token[3]);
+        originAirport = token[4];
+        destinationAirport = token[5];
+        ticketType = token[6];
+        ticketQuantity = Integer.parseInt(token[7]);
+        currFlight = autoFlightLog.get(flightID);
+        currCustomer = findCustomerObj(customerLog, firstName, lastName);
+        if(ticketType.equalsIgnoreCase("First Class")){
+          classOption = 1;
+        }
+        else if (ticketType.equalsIgnoreCase("Business Class")){
+          classOption = 2;
+        }
+        else if (ticketType.equalsIgnoreCase("Main Cabin")){
+          classOption = 3;
+        }
+        else{
+          classOption = 4;
+        }
+        //System.out.println(i + ": " + currCustomer.getFirstName() + " " + currCustomer.getLastName()); //Debug
+        autoCustomerPurchaseOptions(currFlight, currCustomer, classOption, logfile, myWriter, csvFileWriter, csvFileName, tickestBought, currCustomer.getRole(), ticketQuantity);
+        i++;
+      }
+    }
+
+    public static void autoCustomerPurchaseOptions(Flight currFlight, Customer currCustomer, int option, String logfile, FileWriter myWriter,FileWriter csvFileWriter, String csvFileName, ArrayList<Ticket> tickestBought, String role, int ticketQuantity) throws IOException{ //Finish method
+      int ticketsPurchase = 0;
+      float ticketsPurchasePrice = 0; //The amount of money per ticket
+      int surchargePerSeat = 0;
+      int totalSeats = currFlight.getTotalSeats();
+      int availableSeats = 0;
+      long confirmationTicketNum = confirmationTicketGenerator();
+      int firstClassRevenue = 0;
+      int businessClassRevenue = 0;
+      int mainCabinClassRevenue = 0;
+      double FIRSTCLASS_EMPLOYEE_DISCOUNT = 0.50; //Constant
+      double EMPLOYEE_DISCOUNT = 0.75;            //Constant
+      double MINERAIRLINES_FEE = 9.15;            //Constant
+      double SECURITY_FEE = 5.60;                 //Constant
+      double MEMBERSHIP_DISCOUNT = 0.05;          //Constant
+      double TEXAS_SALES_TAX = 0.0825;            //Constant
+      double securityFee = 0.0;
+      double salesTax = 0.0;
+      double membershipSaving = 0.0;
+      double membershipTotalSaving = 0.0;
+      double discountPrice = 0.0;
+      double totalCollectedAirportFees = 0.0;
+      Ticket ticketCSVFile = new Ticket();
+
+      boolean checkTickets = true;
+
+      Ticket firstClassTicketCt = new Ticket(8,0,0); //Tickets allowed for first class
+      Ticket businessClassTicketCt = new Ticket(8,0,0); //Tickets allowed for business class
+      Ticket mainCabinTicketCt = new Ticket(8,0,0); //Tickets allowed for main cabin 
+
+      ArrayList<Ticket> totalTickets = new ArrayList<Ticket>();
+
+      try {
+        myWriter.write("Changes made while in auto purchese mode: \n");
+      }catch (IOException e) {
+        System.out.println("\nAn error occurred while writting to file!");
+        e.printStackTrace();
+      }
+      //System.out.println(currCustomer.getFirstName() + " " + currCustomer.getLastName());
+      switch(option){
+        case 1:
+        availableSeats = currFlight.getFirstClassSeats();
+
+        ticketsPurchase = ticketQuantity;
+        if(ticketQuantity == 0){
+          try {
+            myWriter.write("User (" + currCustomer.getUsername() +") did not purchase a first class ticket(s) for Flight ID: " + currFlight.getID());
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") bought " + firstClassTicketCt.getNumOfTicketsPurchased() + " tickets.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $0.00 for the transaction fee.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $0.00 in security fee(s).");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") saved a total of $0.00");
+            myWriter.write("\nThe ticket cost is $"  + currFlight.getFirstClassPrice() + " per seat.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " has a surcharge of $" + currFlight.getSurcharge());
+            myWriter.write("\nFirst class now has " + currFlight.getFirstClassSeats() + " seats available.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " now has " + currFlight.getTotalSeats() + " total seats.");
+            myWriter.write("\nComfitmation number is: " + confirmationTicketNum + "\n");
+            myWriter.write("\n");
+          } catch (IOException e) {
+            System.out.println("\nAn error occurred while writting to file!");
+            e.printStackTrace();
+          }
+        } else if(ticketQuantity > 0 && ticketQuantity < 9){ // checks the amount of tickets entered
+          if(role.equalsIgnoreCase("Employee") && currCustomer.getMinerAirMembership()){
+            discountPrice += currFlight.getFirstClassPrice() - (currFlight.getFirstClassPrice() * (FIRSTCLASS_EMPLOYEE_DISCOUNT + MEMBERSHIP_DISCOUNT));
+            membershipSaving += currFlight.getFirstClassPrice() * FIRSTCLASS_EMPLOYEE_DISCOUNT;
+            membershipTotalSaving += ticketsPurchase * (currFlight.getFirstClassPrice() * (FIRSTCLASS_EMPLOYEE_DISCOUNT + MEMBERSHIP_DISCOUNT));
+            ticketsPurchasePrice += ticketsPurchase * discountPrice;
+          }
+          else if(role.equalsIgnoreCase("Employee")){
+            discountPrice += currFlight.getFirstClassPrice() - (currFlight.getFirstClassPrice() * FIRSTCLASS_EMPLOYEE_DISCOUNT);
+            membershipSaving += (currFlight.getFirstClassPrice() * FIRSTCLASS_EMPLOYEE_DISCOUNT);
+            membershipTotalSaving += ticketsPurchase * (currFlight.getFirstClassPrice() * FIRSTCLASS_EMPLOYEE_DISCOUNT);
+            ticketsPurchasePrice += ticketsPurchase * discountPrice;
+          }
+          else if(currCustomer.getMinerAirMembership()){ //Apply discount if member
+            discountPrice += currFlight.getFirstClassPrice() - (currFlight.getFirstClassPrice() * MEMBERSHIP_DISCOUNT);
+            membershipSaving += currFlight.getFirstClassPrice() * MEMBERSHIP_DISCOUNT;
+            membershipTotalSaving += ticketsPurchase * (currFlight.getFirstClassPrice() * MEMBERSHIP_DISCOUNT);
+            ticketsPurchasePrice += ticketsPurchase * discountPrice;
+          }
+          else{
+            ticketsPurchasePrice += ticketsPurchase * currFlight.getFirstClassPrice();
+          }
+  
+          salesTax += (ticketsPurchasePrice * TEXAS_SALES_TAX); //Taxes before all discounts and fees
+          securityFee += ticketsPurchase * SECURITY_FEE; // $5.60 security fee per ticket
+          ticketsPurchasePrice += securityFee;
+          ticketsPurchasePrice += MINERAIRLINES_FEE;       // $9.15 per ticket transaction
+          ticketsPurchasePrice += currFlight.getOrginAirportFee();        //Orgin airport fee
+          ticketsPurchasePrice += currFlight.getDestinationAirportFee();  //Destintion airport fee
+          surchargePerSeat += ticketsPurchase * currFlight.getSurcharge();
+  
+          if (currFlight.isInternational()){           //Add surcharge is it is an international flight
+            ticketsPurchasePrice += surchargePerSeat;
+          }
+  
+          ticketsPurchasePrice += salesTax;
+  
+          if(checkBalance(currCustomer, ticketsPurchasePrice)){
+  
+            currCustomer.setFlightsPurchased(ticketsPurchase);
+            firstClassRevenue += (ticketQuantity * currFlight.getFirstClassPrice()) - discountPrice - salesTax - securityFee;
+            totalCollectedAirportFees += currFlight.getOrginAirportFee() + currFlight.getDestinationAirportFee();
+            currFlight.setFirstClassRevenue(firstClassRevenue);
+            currFlight.setAirportCollectedFees(totalCollectedAirportFees);
+  
+            confirmationTicketNum = confirmationTicketGenerator();
+  
+            firstClassTicketCt.setNumOfTicketsPurchased(ticketsPurchase); //add ticket purchesed
+  
+          }else{
+            ticketsPurchase = 0;
+            ticketsPurchasePrice = 0;
+            checkTickets = true;
+          }
+          availableSeats = availableSeats - ticketsPurchase;
+          currFlight.setFirstClassSeats(availableSeats);
+          currFlight.setFirstClassSeatsSold(ticketsPurchase);
+
+          currFlight.setTotalSeats(totalSeats - currFlight.getFirstClassSeatsSold());
+
+          firstClassTicketCt.setNumberOfSeats(ticketsPurchase);
+          firstClassTicketCt.setComfirmationNum(confirmationTicketNum);
+          totalTickets.add(firstClassTicketCt);
+          Ticket test = new Ticket(currFlight.getID(), currFlight.getFlightNum(), currFlight.getOriginAirport(),currFlight.getDestinationAirport(), currFlight.getDepartureDate(),
+          currFlight.getDepartureTime(), ticketsPurchase, ticketsPurchasePrice, "First Class", "ACTIVE", confirmationTicketNum, currCustomer.getFirstName(), currCustomer.getLastName());
+
+          tickestBought.add(new Ticket(currFlight.getID(), currFlight.getFlightNum(), currFlight.getOriginAirport(),currFlight.getDestinationAirport(), currFlight.getDepartureDate(),
+          currFlight.getDepartureTime(), ticketsPurchase, ticketsPurchasePrice, "First Class", "ACTIVE", confirmationTicketNum, currCustomer.getFirstName(), currCustomer.getLastName()));
+
+          //currFlight.listOfPurchasedTickets(firstClassTicketCt);
+          currFlight.listOfPurchasedTickets(test);
+
+          try {
+            DecimalFormat df = new DecimalFormat("0.00");
+            myWriter.write("User (" + currCustomer.getUsername() +") purchased a first class ticket(s) for Flight ID: " + currFlight.getID());
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") bought " + firstClassTicketCt.getNumOfTicketsPurchased() + " tickets.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $" + MINERAIRLINES_FEE + " for the transaction fee.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $" + df.format(securityFee) + " in security fee(s).");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") saved a total of $" + df.format(membershipTotalSaving));
+            myWriter.write("\nThe ticket cost is $"  + currFlight.getFirstClassPrice() + " per seat.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " has a surcharge of $" + currFlight.getSurcharge());
+            myWriter.write("\nFirst class now has " + currFlight.getFirstClassSeats() + " seats available.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " now has " + currFlight.getTotalSeats() + " total seats.");
+            myWriter.write("\nComfitmation number is: " + confirmationTicketNum + "\n");
+            myWriter.write("\n");
+          } catch (IOException e) {
+            System.out.println("\nAn error occurred while writting to file!");
+            e.printStackTrace();
+          }
+          ticketCSVFile = new Ticket(currFlight.getID(),currCustomer.getFirstName(),currCustomer.getLastName(),"First Class",firstClassTicketCt.getNumberOfSeats(),ticketsPurchasePrice);
+          ticketHistoryCSVFileWriter(csvFileWriter,ticketCSVFile);
+        }
+        /************************************************************************************************************************************/
+        case 2:
+        availableSeats = currFlight.getBusinessClassSeats();
+
+        ticketsPurchase = ticketQuantity;
+        if(ticketQuantity == 0){
+          try {
+            myWriter.write("User (" + currCustomer.getUsername() +") did not purchase a business class ticket(s) for Flight ID: " + currFlight.getID());
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") bought " + businessClassTicketCt.getNumOfTicketsPurchased() + " tickets.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $0.00 for the transaction fee.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $0.00 in security fee(s).");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") saved a total of $0.00");
+            myWriter.write("\nThe ticket cost is $"  + currFlight.getBusinessClassPrice() + " per seat.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " has a surcharge of $" + currFlight.getSurcharge());
+            myWriter.write("\nBusiness class now has " + currFlight.getBusinessClassSeats() + " seats available.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " now has " + currFlight.getTotalSeats() + " total seats.");
+            myWriter.write("\nComfitmation number is: " + confirmationTicketNum + "\n");
+            myWriter.write("\n");
+          } catch (IOException e) {
+            System.out.println("\nAn error occurred while writting to file!");
+            e.printStackTrace();
+          }
+        } else if(ticketQuantity > 0 && ticketQuantity < 9){ // checks the amount of tickets entered
+          if(role.equalsIgnoreCase("Employee") && currCustomer.getMinerAirMembership()){
+            discountPrice += currFlight.getBusinessClassPrice() - (currFlight.getBusinessClassPrice() * (EMPLOYEE_DISCOUNT + MEMBERSHIP_DISCOUNT));
+            membershipSaving += currFlight.getBusinessClassPrice() * EMPLOYEE_DISCOUNT;
+            membershipTotalSaving += ticketsPurchase * (currFlight.getBusinessClassPrice() * (EMPLOYEE_DISCOUNT + MEMBERSHIP_DISCOUNT));
+            ticketsPurchasePrice += ticketsPurchase * discountPrice;
+          }
+          else if(role.equalsIgnoreCase("Employee")){
+            discountPrice += currFlight.getBusinessClassPrice() - (currFlight.getBusinessClassPrice() * EMPLOYEE_DISCOUNT);
+            membershipSaving += (currFlight.getBusinessClassPrice() * EMPLOYEE_DISCOUNT);
+            membershipTotalSaving += ticketsPurchase * (currFlight.getBusinessClassPrice() * EMPLOYEE_DISCOUNT);
+            ticketsPurchasePrice += ticketsPurchase * discountPrice;
+          }
+          else if(currCustomer.getMinerAirMembership()){ //Apply discount if member
+            discountPrice += currFlight.getBusinessClassPrice() - (currFlight.getBusinessClassPrice() * MEMBERSHIP_DISCOUNT);
+            membershipSaving += currFlight.getBusinessClassPrice() * MEMBERSHIP_DISCOUNT;
+            membershipTotalSaving += ticketsPurchase * (currFlight.getBusinessClassPrice() * MEMBERSHIP_DISCOUNT);
+            ticketsPurchasePrice += ticketsPurchase * discountPrice;
+          }
+          else{
+            ticketsPurchasePrice += ticketsPurchase * currFlight.getBusinessClassPrice();
+          }
+  
+          salesTax += (ticketsPurchasePrice * TEXAS_SALES_TAX); //Taxes before all discounts and fees
+          securityFee += ticketsPurchase * SECURITY_FEE; // $5.60 security fee per ticket
+          ticketsPurchasePrice += securityFee;
+          ticketsPurchasePrice += MINERAIRLINES_FEE;       // $9.15 per ticket transaction
+          ticketsPurchasePrice += currFlight.getOrginAirportFee();        //Orgin airport fee
+          ticketsPurchasePrice += currFlight.getDestinationAirportFee();  //Destintion airport fee
+          surchargePerSeat += ticketsPurchase * currFlight.getSurcharge();
+  
+          if (currFlight.isInternational()){           //Add surcharge is it is an international flight
+            ticketsPurchasePrice += surchargePerSeat;
+          }
+  
+          ticketsPurchasePrice += salesTax;
+  
+          if(checkBalance(currCustomer, ticketsPurchasePrice)){
+  
+            currCustomer.setFlightsPurchased(ticketsPurchase);
+            businessClassRevenue += (ticketQuantity * currFlight.getBusinessClassPrice()) - discountPrice - salesTax - securityFee;
+            totalCollectedAirportFees += currFlight.getOrginAirportFee() + currFlight.getDestinationAirportFee();
+            currFlight.setBusinessClassRevenue(businessClassRevenue);
+            currFlight.setAirportCollectedFees(totalCollectedAirportFees);
+  
+            confirmationTicketNum = confirmationTicketGenerator();
+  
+            businessClassTicketCt.setNumOfTicketsPurchased(ticketsPurchase); //add ticket purchesed
+  
+          }else{
+            ticketsPurchase = 0;
+            ticketsPurchasePrice = 0;
+            checkTickets = true;
+          }
+          availableSeats = availableSeats - ticketsPurchase;
+          currFlight.setBusinessClassSeats(availableSeats);
+          currFlight.setBusinessClassSeats(ticketsPurchase);
+
+          currFlight.setTotalSeats(totalSeats - currFlight.getBusinessClassSeatsSold());
+
+          businessClassTicketCt.setNumberOfSeats(ticketsPurchase);
+          businessClassTicketCt.setComfirmationNum(confirmationTicketNum);
+          totalTickets.add(businessClassTicketCt);
+          Ticket test2 = new Ticket(currFlight.getID(), currFlight.getFlightNum(), currFlight.getOriginAirport(),currFlight.getDestinationAirport(), currFlight.getDepartureDate(),
+          currFlight.getDepartureTime(), ticketsPurchase, ticketsPurchasePrice, "Business Class", "ACTIVE", confirmationTicketNum, currCustomer.getFirstName(), currCustomer.getLastName());
+
+          tickestBought.add(new Ticket(currFlight.getID(), currFlight.getFlightNum(), currFlight.getOriginAirport(),currFlight.getDestinationAirport(), currFlight.getDepartureDate(),
+          currFlight.getDepartureTime(), ticketsPurchase, ticketsPurchasePrice, "Business Class", "ACTIVE", confirmationTicketNum, currCustomer.getFirstName(), currCustomer.getLastName()));
+
+          currFlight.listOfPurchasedTickets(test2);
+
+          try {
+            DecimalFormat df = new DecimalFormat("0.00");
+            myWriter.write("User (" + currCustomer.getUsername() +") purchased a business class ticket(s) for Flight ID: " + currFlight.getID());
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") bought " + businessClassTicketCt.getNumOfTicketsPurchased() + " tickets.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $" + MINERAIRLINES_FEE + " for the transaction fee.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $" + df.format(securityFee) + " in security fee(s).");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") saved a total of $" + df.format(membershipTotalSaving));
+            myWriter.write("\nThe ticket cost is $"  + currFlight.getBusinessClassPrice() + " per seat.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " has a surcharge of $" + currFlight.getSurcharge());
+            myWriter.write("\nBusiness class now has " + currFlight.getBusinessClassSeats() + " seats available.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " now has " + currFlight.getTotalSeats() + " total seats.");
+            myWriter.write("\nComfitmation number is: " + confirmationTicketNum + "\n");
+            myWriter.write("\n");
+          } catch (IOException e) {
+            System.out.println("\nAn error occurred while writting to file!");
+            e.printStackTrace();
+          }
+          ticketCSVFile = new Ticket(currFlight.getID(),currCustomer.getFirstName(),currCustomer.getLastName(),"Business Class",businessClassTicketCt.getNumberOfSeats(),ticketsPurchasePrice);
+          ticketHistoryCSVFileWriter(csvFileWriter,ticketCSVFile);
+        }
+        //System.out.println("Stuck here business class finished");
+        break;
+        /************************************************************************************************************************************/
+        case 3:
+        availableSeats = currFlight.getMainCabinSeats();
+
+        ticketsPurchase = ticketQuantity;
+        if(ticketQuantity == 0){
+          try {
+            myWriter.write("User (" + currCustomer.getUsername() +") did not purchase a main cabin class ticket(s) for Flight ID: " + currFlight.getID());
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") bought " + mainCabinTicketCt.getNumOfTicketsPurchased() + " tickets.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $0.00 for the transaction fee.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $0.00 in security fee(s).");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") saved a total of $0.00");
+            myWriter.write("\nThe ticket cost is $"  + currFlight.getMainCabinPrice() + " per seat.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " has a surcharge of $" + currFlight.getSurcharge());
+            myWriter.write("\nFirst class now has " + currFlight.getMainCabinSeats() + " seats available.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " now has " + currFlight.getTotalSeats() + " total seats.");
+            myWriter.write("\nComfitmation number is: " + confirmationTicketNum + "\n");
+            myWriter.write("\n");
+          } catch (IOException e) {
+            System.out.println("\nAn error occurred while writting to file!");
+            e.printStackTrace();
+          }
+        } else if(ticketQuantity > 0 && ticketQuantity < 9){ // checks the amount of tickets entered
+          if(role.equalsIgnoreCase("Employee") && currCustomer.getMinerAirMembership()){
+            discountPrice += currFlight.getMainCabinPrice() - (currFlight.getMainCabinPrice() * (EMPLOYEE_DISCOUNT + MEMBERSHIP_DISCOUNT));
+            membershipSaving += (currFlight.getMainCabinPrice() * EMPLOYEE_DISCOUNT);
+            membershipTotalSaving += ticketsPurchase * (currFlight.getMainCabinPrice() * (EMPLOYEE_DISCOUNT + MEMBERSHIP_DISCOUNT));
+            ticketsPurchasePrice += ticketsPurchase * discountPrice;
+          }
+          else if(role.equalsIgnoreCase("Employee")){
+            discountPrice += currFlight.getMainCabinPrice() - (currFlight.getMainCabinPrice() * EMPLOYEE_DISCOUNT);
+            membershipSaving += (currFlight.getMainCabinPrice() * EMPLOYEE_DISCOUNT);
+            membershipTotalSaving += ticketsPurchase * (currFlight.getMainCabinPrice() * EMPLOYEE_DISCOUNT);
+            ticketsPurchasePrice += ticketsPurchase * discountPrice;
+          }
+          else if(currCustomer.getMinerAirMembership()){ //Apply discount if member
+            discountPrice += currFlight.getMainCabinPrice() - (currFlight.getMainCabinPrice() * MEMBERSHIP_DISCOUNT);
+            membershipSaving += (currFlight.getMainCabinPrice() * MEMBERSHIP_DISCOUNT);
+            membershipTotalSaving += ticketsPurchase * (currFlight.getMainCabinPrice() * MEMBERSHIP_DISCOUNT);
+            ticketsPurchasePrice += ticketsPurchase * discountPrice;
+          }
+          else{
+            ticketsPurchasePrice += ticketsPurchase * currFlight.getMainCabinPrice();
+          }
+  
+          salesTax += (ticketsPurchasePrice * TEXAS_SALES_TAX); //Taxes before all discounts and fees
+          securityFee += ticketsPurchase * SECURITY_FEE; // $5.60 security fee per ticket
+          ticketsPurchasePrice += securityFee;
+          ticketsPurchasePrice += MINERAIRLINES_FEE;       // $9.15 per ticket transaction
+          ticketsPurchasePrice += currFlight.getOrginAirportFee();        //Orgin airport fee
+          ticketsPurchasePrice += currFlight.getDestinationAirportFee();  //Destintion airport fee
+          surchargePerSeat += ticketsPurchase * currFlight.getSurcharge();
+  
+          if (currFlight.isInternational()){           //Add surcharge is it is an international flight
+            ticketsPurchasePrice += surchargePerSeat;
+          }
+  
+          ticketsPurchasePrice += salesTax;
+  
+          if(checkBalance(currCustomer, ticketsPurchasePrice)){
+  
+            currCustomer.setFlightsPurchased(ticketsPurchase);
+            mainCabinClassRevenue += (ticketQuantity * currFlight.getMainCabinPrice()) - discountPrice - salesTax - securityFee;
+            totalCollectedAirportFees += currFlight.getOrginAirportFee() + currFlight.getDestinationAirportFee();
+            currFlight.setMainCabinClassRevenue(mainCabinClassRevenue);
+            currFlight.setAirportCollectedFees(totalCollectedAirportFees);
+  
+            confirmationTicketNum = confirmationTicketGenerator();
+  
+            mainCabinTicketCt.setNumOfTicketsPurchased(ticketsPurchase); //add ticket purchesed
+  
+          }else{
+            ticketsPurchase = 0;
+            ticketsPurchasePrice = 0;
+            checkTickets = true;
+          }
+          availableSeats = availableSeats - ticketsPurchase;
+          currFlight.setMainCabinSeats(availableSeats);
+          currFlight.setMainCabinClassSeatsSold(ticketsPurchase);
+
+          currFlight.setTotalSeats(totalSeats - currFlight.getMainCabinClassSeatsSold());
+
+          mainCabinTicketCt.setNumberOfSeats(ticketsPurchase);
+          mainCabinTicketCt.setComfirmationNum(confirmationTicketNum);
+          totalTickets.add(mainCabinTicketCt);
+          Ticket test3 = new Ticket(currFlight.getID(), currFlight.getFlightNum(), currFlight.getOriginAirport(),currFlight.getDestinationAirport(), currFlight.getDepartureDate(),
+          currFlight.getDepartureTime(), ticketsPurchase, ticketsPurchasePrice, "Main Class", "ACTIVE", confirmationTicketNum, currCustomer.getFirstName(), currCustomer.getLastName());
+
+          tickestBought.add(new Ticket(currFlight.getID(), currFlight.getFlightNum(), currFlight.getOriginAirport(),currFlight.getDestinationAirport(), currFlight.getDepartureDate(),
+          currFlight.getDepartureTime(), ticketsPurchase, ticketsPurchasePrice, "Main Class", "ACTIVE", confirmationTicketNum, currCustomer.getFirstName(), currCustomer.getLastName()));
+
+          currFlight.listOfPurchasedTickets(test3);
+
+          try {
+            DecimalFormat df = new DecimalFormat("0.00");
+            myWriter.write("User (" + currCustomer.getUsername() +") purchased a main cabin class ticket(s) for Flight ID: " + currFlight.getID());
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") bought " + mainCabinTicketCt.getNumOfTicketsPurchased() + " tickets.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $" + MINERAIRLINES_FEE + " for the transaction fee.");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") was charged $" + df.format(securityFee) + " in security fee(s).");
+            myWriter.write("\nUser (" + currCustomer.getUsername() + ") saved a total of $" + df.format(membershipTotalSaving));
+            myWriter.write("\nThe ticket cost is $"  + currFlight.getMainCabinPrice() + " per seat.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " has a surcharge of $" + currFlight.getSurcharge());
+            myWriter.write("\nFirst class now has " + currFlight.getMainCabinSeats() + " seats available.");
+            myWriter.write("\nFlight ID: " + currFlight.getID() + " now has " + currFlight.getTotalSeats() + " total seats.");
+            myWriter.write("\nComfitmation number is: " + confirmationTicketNum + "\n");
+            myWriter.write("\n");
+          } catch (IOException e) {
+            System.out.println("\nAn error occurred while writting to file!");
+            e.printStackTrace();
+          }
+          ticketCSVFile = new Ticket(currFlight.getID(),currCustomer.getFirstName(),currCustomer.getLastName(),"Main Class",mainCabinTicketCt.getNumberOfSeats(),ticketsPurchasePrice);
+          ticketHistoryCSVFileWriter(csvFileWriter,ticketCSVFile);
+        }
+        //System.out.println("Stuck here main class finished");
+        break;
+        /************************************************************************************************************************************/
+        case 4:
+         try {
+          myWriter.write("User (" + currCustomer.getUsername() +") has exited out of the program.");
+          myWriter.write("\n");
+        } catch (IOException e) {
+          System.out.println("\nAn error occurred while writting to file!");
+          e.printStackTrace();
+        }
+         break;
+      }
+      
+    }
+
+    public static void ticketSummary(FileWriter myWriter, Flight currTicket, int idx) throws IOException{
+      try {
+        DecimalFormat df = new DecimalFormat("0.00");
+        myWriter.write("Confirmation Number: " + currTicket.getListOfTickets().get(idx).getComfirmationNum());
+        myWriter.write("\nFlight Origin Airport Code: " + currTicket.getOriginCode());
+        myWriter.write("\nFlight Origin Airport Name: " + currTicket.getOriginAirport());
+        myWriter.write("\nFlight Destination Airport Code: " + currTicket.getDestinationCode());
+        myWriter.write("\nFlight Destination Airport Name: " + currTicket.getDestinationAirport());
+        myWriter.write("\nDeparture Date: " + currTicket.getDepartureDate());
+        myWriter.write("\nDeparture Time: " + currTicket.getDepartureTime());
+        myWriter.write("\nArrival Date: " + currTicket.getArrivalDate());
+        myWriter.write("\nArrival Time: " + currTicket.getArrivalTime());
+        myWriter.write("\nTicket Type: " + currTicket.getListOfTickets().get(idx).getClassType());
+        myWriter.write("\nTicket Quantity: " + currTicket.getListOfTickets().get(0).getNumberOfSeats());
+        myWriter.write("\nTotal Cost: " + df.format(currTicket.getListOfTickets().get(idx).getClassCost()));
+        myWriter.write("\n");
+        myWriter.write("\n");
+      } catch (IOException e) {
+        System.out.println("\nAn error occurred while writting to file!");
+        e.printStackTrace();
+      }
+    }
+
+    public static void processTickets(FileWriter myWriter, Flight flight, String firstName, String lastName) throws IOException {
+      for (Ticket ticket : flight.getListOfTickets()) {
+        if(ticket.getTicketFirstName().equalsIgnoreCase(firstName) && ticket.getTickeLastName().equalsIgnoreCase(lastName)) {
+          ticketSummary(myWriter, flight, flight.getListOfTickets().indexOf(ticket));
+        }
+      }
+    }
 }

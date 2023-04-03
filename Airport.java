@@ -30,6 +30,7 @@ public abstract class Airport {
     private String originCode;          //Now in Airport.java
     private String destinationAirport;  //Now in Airport.java
     private String destinationCode;     //Now in Airport.java
+    private double airportCollectedFees;
     /**
      * Default constructor
      */
@@ -309,6 +310,20 @@ public abstract class Airport {
      */
     public void setOriginAirportLounge(boolean originAirportLounge) {
         this.originAirportLounge = originAirportLounge;
+    }
+    /**
+     * 
+     * @return This method returns the amunt of money that has been collected in airport fees.
+     */
+    public double getAirportCollectedFees() {
+        return airportCollectedFees;
+    }
+    /**
+     * 
+     * @param airportCollectedFees In this variable you will pass on the amount of collected airport fees.
+     */
+    public void setAirportCollectedFees(double airportCollectedFees) {
+        this.airportCollectedFees = airportCollectedFees;
     }
     
 }

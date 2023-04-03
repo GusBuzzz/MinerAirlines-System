@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /*
  * Name: Gustavo Rubio
  * Date: March 21, 2023
@@ -23,6 +25,9 @@ public class Customer extends Person{
 
     private String username;
     private String password;
+
+    private ArrayList<Ticket> ticketCollection = new ArrayList<Ticket>();
+
     /**
      * Default constructor
      */
@@ -158,6 +163,14 @@ public class Customer extends Person{
      */
     public String getPassword() {
         return this.password;
+    }
+
+    public ArrayList<Ticket> getTicketCollection() {
+        return ticketCollection;
+    }
+
+    public void setTicketCollection(ArrayList<Ticket> ticketCollection) {
+        this.ticketCollection = ticketCollection;
     }
     
 }

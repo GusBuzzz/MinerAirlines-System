@@ -524,8 +524,8 @@ public class Flight extends Airport{
     public void printFlight(){
         System.out.println("Flight ID: " + this.ID +"\nFlight Number: " + this.flightNum + "\nAirport Origin: " + getOriginAirport() + "\nAirport Origin City: " + getOriginAirportCity()+ "\nAirport Origin State: " + getOriginAirportState() + "\nAirport Origin Country: " + getOriginAirportCountry()+ "\nOrigin Code: " + getOriginCode() +
          "\nAirport Destination: " + getDestinationAirport() + "\nAirport Destination City: " + getDestinationAirportCity() + "\nAirport Destination State: " + getDestinationAirportState() + "\nAirport Destination Country: " + getDestinationAirportCountry() + "\nDestination Code: " + getDestinationCode() + "\nDeparture Date: " + this.departureDate +
-         "\nDeparture Time: " + this.departureTime + "\nArrival Date: " + this.arrivalDate + "\nArrival Time: " + this.arrivalTime + "\nDuration: " + this.duration + "\nDistance: " + this.distance + "\nTime Zone Diff: " + this.timeZoneDifference + "\nFlight Type: " + this.flightType + "\nFirst Class Price: " + this.firstClassPrice +
-         "\nBusiness Class Price: " + this.businessClassPrice + "\nMain Cabin Price: " + this.mainCabinPrice + "\nFirst Class Seats: " + this.firstClassSeats +  "\nBusiness Class Seats: " + this.businessClassSeats + "\nMain Cabin Seats: " + this.mainCabinSeats + "\nTotal Seats: " + this.totalSeats);
+         "\nDeparture Time: " + this.departureTime + "\nArrival Date: " + this.arrivalDate + "\nArrival Time: " + this.arrivalTime + "\nDuration: " + this.duration + " mins" + "\nDistance: " + this.distance +" miles"+ "\nTime Zone Diff: " + this.timeZoneDifference +" hour(s)" + "\nFlight Type: " + this.flightType + "\nFirst Class Price: $" + this.firstClassPrice +
+         "\nBusiness Class Price: $" + this.businessClassPrice + "\nMain Cabin Price: $" + this.mainCabinPrice + "\nFirst Class Seats: " + this.firstClassSeats +  "\nBusiness Class Seats: " + this.businessClassSeats + "\nMain Cabin Seats: " + this.mainCabinSeats + "\nTotal Seats: " + this.totalSeats);
     }
 
     //change departure date and arrival date

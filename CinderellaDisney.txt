@@ -1,0 +1,169 @@
+Confirmation Number: 2823
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: LAX
+Flight Destination Airport Name: Los Angeles International Airport
+Departure Date: 3/24/23
+Departure Time: 5:30 AM
+Arrival Date: 3/24/23
+Arrival Time: 6:23 AM
+Ticket Type: Main Class
+Ticket Quantity: 3
+Total Cost: 1511.06
+
+Confirmation Number: 2201
+Flight Origin Airport Code: CJS
+Flight Origin Airport Name: Abraham Gonzalez International Airport
+Flight Destination Airport Code: MEX
+Flight Destination Airport Name: Aeropuerto Internacional Benito Juarez
+Departure Date: 3/24/23
+Departure Time: 12:10 PM
+Arrival Date: 3/24/23
+Arrival Time: 3:32 PM
+Ticket Type: Business Class
+Ticket Quantity: 0
+Total Cost: 0.0
+
+Confirmation Number: 1056
+Flight Origin Airport Code: JFK
+Flight Origin Airport Name: John F. Kennedy International Airport
+Flight Destination Airport Code: ELP
+Flight Destination Airport Name: El Paso International Airport
+Departure Date: 3/26/23
+Departure Time: 12:10 PM
+Arrival Date: 3/26/23
+Arrival Time: 2:26 PM
+Ticket Type: Main Class
+Ticket Quantity: 1
+Total Cost: 1729.93
+
+Confirmation Number: 4859
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: CDG
+Flight Destination Airport Name: Paris Charles de Gaulle Airport
+Departure Date: 3/27/23
+Departure Time: 12:10 PM
+Arrival Date: 3/28/23
+Arrival Time: 6:49 AM
+Ticket Type: Main Class
+Ticket Quantity: 0
+Total Cost: 0.0
+
+Confirmation Number: 4189
+Flight Origin Airport Code: JFK
+Flight Origin Airport Name: John F. Kennedy International Airport
+Flight Destination Airport Code: ELP
+Flight Destination Airport Name: El Paso International Airport
+Departure Date: 3/29/23
+Departure Time: 12:10 PM
+Arrival Date: 3/29/23
+Arrival Time: 2:26 PM
+Ticket Type: Business Class
+Ticket Quantity: 8
+Total Cost: 0.0
+
+Confirmation Number: 3832
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: HND
+Flight Destination Airport Name: Tokyo Haneda Airport
+Departure Date: 4/1/23
+Departure Time: 12:10 PM
+Arrival Date: 4/2/23
+Arrival Time: 4:15 PM
+Ticket Type: Business Class
+Ticket Quantity: 7
+Total Cost: 0.0
+
+Confirmation Number: 4617
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: LAX
+Flight Destination Airport Name: Los Angeles International Airport
+Departure Date: 4/3/23
+Departure Time: 12:10 PM
+Arrival Date: 4/3/23
+Arrival Time: 1:03 PM
+Ticket Type: Main Class
+Ticket Quantity: 5
+Total Cost: 0.0
+
+Confirmation Number: 4029
+Flight Origin Airport Code: LAS
+Flight Origin Airport Name: Harry Reid International Airport
+Flight Destination Airport Code: ELP
+Flight Destination Airport Name: El Paso International Airport
+Departure Date: 4/3/23
+Departure Time: 8:25 AM
+Arrival Date: 4/3/23
+Arrival Time: 11:02 AM
+Ticket Type: Business Class
+Ticket Quantity: 3
+Total Cost: 0.0
+
+Confirmation Number: 3874
+Flight Origin Airport Code: LAX
+Flight Origin Airport Name: Los Angeles International Airport
+Flight Destination Airport Code: ORL
+Flight Destination Airport Name: Orlando International Airport
+Departure Date: 4/3/23
+Departure Time: 8:25 AM
+Arrival Date: 4/3/23
+Arrival Time: 4:06 PM
+Ticket Type: Business Class
+Ticket Quantity: 8
+Total Cost: 0.0
+
+Confirmation Number: 1703
+Flight Origin Airport Code: JFK
+Flight Origin Airport Name: John F. Kennedy International Airport
+Flight Destination Airport Code: ELP
+Flight Destination Airport Name: El Paso International Airport
+Departure Date: 4/4/23
+Departure Time: 8:25 AM
+Arrival Date: 4/4/23
+Arrival Time: 10:41 AM
+Ticket Type: First Class
+Ticket Quantity: 4
+Total Cost: 0.0
+
+Confirmation Number: 1703
+Flight Origin Airport Code: JFK
+Flight Origin Airport Name: John F. Kennedy International Airport
+Flight Destination Airport Code: ELP
+Flight Destination Airport Name: El Paso International Airport
+Departure Date: 4/4/23
+Departure Time: 8:25 AM
+Arrival Date: 4/4/23
+Arrival Time: 10:41 AM
+Ticket Type: Business Class
+Ticket Quantity: 4
+Total Cost: 0.0
+
+Confirmation Number: 4044
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: ORD
+Flight Destination Airport Name: Chicago International Airport
+Departure Date: 4/5/23
+Departure Time: 5:30 AM
+Arrival Date: 4/5/23
+Arrival Time: 9:26 AM
+Ticket Type: First Class
+Ticket Quantity: 2
+Total Cost: 0.0
+
+Confirmation Number: 4044
+Flight Origin Airport Code: ELP
+Flight Origin Airport Name: El Paso International Airport
+Flight Destination Airport Code: ORD
+Flight Destination Airport Name: Chicago International Airport
+Departure Date: 4/5/23
+Departure Time: 5:30 AM
+Arrival Date: 4/5/23
+Arrival Time: 9:26 AM
+Ticket Type: Business Class
+Ticket Quantity: 2
+Total Cost: 0.0
+
