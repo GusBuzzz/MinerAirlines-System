@@ -2163,7 +2163,18 @@ public class RunFlight {
         System.out.printf("%.2f", flightLog.get(i).getAirportCollectedFees());
       }
     }
-
+    /**
+     * 
+     * @param autoFileName This variable will contain the name of the autofile that the scanner will read.
+     * @param flightLog This variable will contain the HashMap that was created when using the flights() method.
+     * @param customerLog This variable will contain the HashMap that was created when using the customers() method.
+     * @param myWriter In this variable you will pass on the file writter object, this will allow you to only use one file writter instead of creating one per method, all writting will go to the Log.txt file.
+     * @param csvFileWriter This variable will contain the name of the file where all of the purchase tickets will be recorded.
+     * @param csvFileName This variable will contain the String name of the file where all of the tickets that have been purchased.
+     * @param logfile This variable will have the String name of the file where all of the logs are being recorded.
+     * @param tickestBought You will need to pass on an array list containing all on the tickets that the current user has bought.
+     * @throws IOException This exception is used for when using the file writter object to write information.
+     */
     public static void autoPurchaseTest(String autoFileName, HashMap<Integer,Flight> flightLog, HashMap<Integer,Customer> customerLog, FileWriter myWriter, FileWriter csvFileWriter, String csvFileName,String logfile, ArrayList<Ticket> tickestBought) throws IOException{
       Scanner autoReader = new Scanner(new File(autoFileName));
 
@@ -2213,7 +2224,20 @@ public class RunFlight {
         i++;
       }
     }
-
+    /**
+     * 
+     * @param currFlight This variable will hold the current flight object.
+     * @param currCustomer This variable will hold the current customer object.
+     * @param option This variable will hold an integer value on which of the 4 options ths customer is holding.
+     * @param logfile This variable will have the String name of the file where all of the logs are being recorded.
+     * @param myWriter In this variable you will pass on the file writter object, this will allow you to only use one file writter instead of creating one per method, all writting will go to the Log.txt file.
+     * @param csvFileWriter This variable will contain the name of the file where all of the purchase tickets will be recorded.
+     * @param csvFileName This variable will contain the String name of the file where all of the tickets that have been purchased
+     * @param tickestBought You will need to pass on an array list containing all on the tickets that the current user has bought.
+     * @param role This variable will hold the String name of the role of the person, the role can be a customer or an employee.
+     * @param ticketQuantity This variable will hold an integer value telling us how many tickets the customer wats to buy.
+     * @throws IOException This exception is used for when using the file writter object to write information.
+     */
     public static void autoCustomerPurchaseOptions(Flight currFlight, Customer currCustomer, int option, String logfile, FileWriter myWriter,FileWriter csvFileWriter, String csvFileName, ArrayList<Ticket> tickestBought, String role, int ticketQuantity) throws IOException{ //Finish method
       int ticketsPurchase = 0;
       float ticketsPurchasePrice = 0; //The amount of money per ticket
@@ -2610,7 +2634,13 @@ public class RunFlight {
       }
       
     }
-
+    /**
+     * 
+     * @param myWriterIn this variable you will pass on the file writter object, this will allow you to only use one file writter instead of creating one per method, all writting will go to the Log.txt file.
+     * @param currTicket This variable will hold the current ticket object.
+     * @param idx This variable will hold the index of where the ticket is stored from the flight objects.
+     * @throws IOException
+     */
     public static void ticketSummary(FileWriter myWriter, Flight currTicket, int idx) throws IOException{
       try {
         DecimalFormat df = new DecimalFormat("0.00");
@@ -2633,7 +2663,14 @@ public class RunFlight {
         e.printStackTrace();
       }
     }
-
+    /**
+     * 
+     * @param myWriter this variable you will pass on the file writter object, this will allow you to only use one file writter instead of creating one per method, all writting will go to the Log.txt file.
+     * @param flight This variable will hold the current flight object.
+     * @param firstName This variable will have the String first name of the customer.
+     * @param lastName This variable will have the String first name of the customer.
+     * @throws IOException
+     */
     public static void processTickets(FileWriter myWriter, Flight flight, String firstName, String lastName) throws IOException {
       for (Ticket ticket : flight.getListOfTickets()) {
         if(ticket.getTicketFirstName().equalsIgnoreCase(firstName) && ticket.getTickeLastName().equalsIgnoreCase(lastName)) {
