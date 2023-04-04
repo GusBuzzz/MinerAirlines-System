@@ -39,20 +39,12 @@ public class RunFlight {
     String autoPurchaseFile3 = "AutoPurchaser400K.csv";
     String ticketSummary = "ticketSummary.txt";
     String logFile = "Log.txt";
-    //boolean verifyInput = true;
-    //boolean verifyMenuOption = true;
-    //boolean isEmployee = false;
-    //boolean isEmployeeCustomer = false;
     boolean systemISRunning = true;
     boolean verifySystemTerminate = true;
-    //String exitOption = "";
-    //String firstName = "";
-    //String lastName = "";
-    //String userName = "";
-    //String password = "";
+    
 
     HashMap<Integer,Flight> flightLog = flights(flightSchedule);
-    HashMap<Integer,Flight> flightTypeList = sortFlights(flightLog); // factory 2nd design pattern
+    //HashMap<Integer,Flight> flightTypeList = sortFlights(flightLog); // factory 2nd design pattern
     HashMap<Integer,Customer> customerLog = customers(customerInfo);
     ArrayList<Employee> employeeLog = employees(customerLog);
     ArrayList<Ticket> ticketsBought = new ArrayList<Ticket>();
@@ -200,7 +192,7 @@ public class RunFlight {
         }
         boolean verifyIDEmployeeMenu = true;
         while (verifyInput && isEmployee && viewByFlightID) {
-
+          verifyMenuOption = true;
           while (verifyInput && isEmployee && verifyIDEmployeeMenu) { // Employee is logged in
               try {
                   System.out.println("\nPlease enter a flight ID to make changes or to view flight status.");
@@ -216,7 +208,7 @@ public class RunFlight {
                       if (verifyFlightID > 0 && verifyFlightID <= flightLog.size()) {
                           System.out.println("\nHere is the information for flight ID " + flightID + ": \n");
                           flightLog.get(verifyFlightID).printFlight();
-                          employeeMenuOptions(flightLog.get(flightID), logFile, myWriter, cancelFlightCsv, userInput, ticketHistoryCSVFileReader(ticketPurchaseHistory), customerLog);
+                          employeeMenuOptions(flightLog.get(flightID), logFile, myWriter, cancelFlightCsv, userInput, ticketsBought, customerLog);
                           verifyInput = false;
                           verifyIDEmployeeMenu = false;
                           viewByFlightID = false;
@@ -249,7 +241,6 @@ public class RunFlight {
                   System.out.println("\nThat was not an option. Please try again.");
               }
           }
-          verifyMenuOption = true;
         }
         
         String exitProgram = "";
@@ -272,7 +263,7 @@ public class RunFlight {
         
       }
       verifyInput = true;
-      isEmployee = true;
+      //isEmployee = true;
       //******************************************** Customer ********************************************//
       while(verifyInput && !isEmployee){ //Verify username and password for customer
         if(currCustomer.getRole().equalsIgnoreCase("Customer")){
@@ -415,7 +406,7 @@ public class RunFlight {
                 System.out.println("\nBased on these flights shown, how would you like to select your flight?" + "\n- To search by Flight ID enter \"FLight ID\". " + "\n- To search by Flight Number enter \"Flight Number\".\n");
                 verifyInput = true;
                 while(verifyInput){
-                  System.out.print("\nEnter option: ");
+                  System.out.print("Enter option: ");
                   searchOption = userInput.nextLine();
                   if (searchOption.equalsIgnoreCase("FLight ID")){
                     System.out.println("\nPlease enter the flight ID number, remember you can only purchace one ticket per transaction.");
@@ -426,7 +417,7 @@ public class RunFlight {
                           if (flightExistByID(flightsByCodes, flightID)) {
                               verifyID = false;
                           } else {
-                              System.out.println("\n* Invalid Flight ID number based on orgin code:" + originCode + " and destination code: " + destinationCode + " please enter a flight ID that matches the flights above *\n");
+                              System.out.println("\n* Invalid Flight ID number based on orgin code: " + originCode + " and destination code: " + destinationCode + " please enter a flight ID that matches the flights above *\n");
                           }
                       } catch (NumberFormatException e) {
                           System.out.println("\n* Please enter a valid integer for the Flight ID *");
@@ -805,6 +796,7 @@ public class RunFlight {
 
                 break;
             case 10: //View customers on this flight
+                DecimalFormat df = new DecimalFormat("0.00");
                 boolean customerTicketFound = false;
                 int routeCost = currFlightObj.getRouteCost();
                 int currProfit = 0;
@@ -821,7 +813,7 @@ public class RunFlight {
                     if(customerTicketFound){
                       System.out.println("\n" + ticketsBought.get(tickestBoughtIdx).getTicketFirstName() + " " + ticketsBought.get(tickestBoughtIdx).getTickeLastName());
                       System.out.println(ticketsBought.get(tickestBoughtIdx).getClassType() + ": " + ticketsBought.get(tickestBoughtIdx).getNumberOfSeats() + " seats");
-                      System.out.println("Total Price: $" +ticketsBought.get(tickestBoughtIdx).getClassCost());
+                      System.out.println("Total Price: $" + df.format(ticketsBought.get(tickestBoughtIdx).getClassCost()));
   
                       if(ticketsBought.get(tickestBoughtIdx).getClassType().equalsIgnoreCase("First Class")){
                         firstClassSeatsSold += ticketsBought.get(tickestBoughtIdx).getNumberOfSeats();
@@ -1964,13 +1956,11 @@ public class RunFlight {
       String [] token; // Used to split information
       String currLine;
       currLine = fileReader.nextLine();// skips header
-      int i = 0;
 
       while(fileReader.hasNext()){ //Generates information about the customer
           currLine = fileReader.nextLine(); //gets next line
           token = currLine.split(",");
           ticketHistory.add(new Ticket(Integer.parseInt(token[0]), token[1], token[2], token[3], Integer.parseInt(token[4]), Float.parseFloat(token[5])));
-          i++;
       }
 
       return ticketHistory;
