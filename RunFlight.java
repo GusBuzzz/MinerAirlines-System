@@ -1,13 +1,14 @@
 /*
  * Name: Gustavo Rubio
- * Date: March 21, 2023
+ * Date: April 4, 2023
  * CS 3331 – Advanced Object-Oriented Programming – Spring 2023
  * Instructor: Dr. Mejia
- * Assignment: PA3
+ * Assignment: PA4
  * This work was done individually and completely on my own. I did not share, reproduce, or alter any part of this assignment for any purpose.
  * I did not share code, upload this assignment online in any form, or view/received/modified code written from anyone else.
  * All deliverables were produced entirely on my own. This assignment is part of an academic course at The University of Texas at El Paso 
  * and a grade will be assigned for the work I produced.
+ * javadoc -d doc *.java
  */
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,10 +21,9 @@ import java.util.Random;
 import java.util.Scanner;
 
 /**
- * The RunFlight main class is responsible for running all necessary methods withing the PA3 folder. the system provides a user friendly 
+ * @version 4.0 The RunFlight main class is responsible for running all necessary methods withing the PA3 folder. the system provides a user friendly 
  * interface for the customer/employee to access the MinerAirlines System. Each the customer and the employee have different use cases on
  * how to use the system; however, the employy may still purchase tickets.
- * @version 1.0
  */
 
 public class RunFlight {

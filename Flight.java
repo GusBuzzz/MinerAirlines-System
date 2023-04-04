@@ -1,9 +1,9 @@
 /*
  * Name: Gustavo Rubio
- * Date: March 21, 2023
+ * Date: April 4, 2023
  * CS 3331 – Advanced Object-Oriented Programming – Spring 2023
  * Instructor: Dr. Mejia
- * Assignment: PA3
+ * Assignment: PA4
  * This work was done individually and completely on my own. I did not share, reproduce, or alter any part of this assignment for any purpose.
  * I did not share code, upload this assignment online in any form, or view/received/modified code written from anyone else.
  * All deliverables were produced entirely on my own. This assignment is part of an academic course at The University of Texas at El Paso 
@@ -12,17 +12,13 @@
 
 import java.util.ArrayList;
 /**
- * @version 3.0 This Flight class object extends to the Airport class. This class is responsible for storing all necessary items that describe a flight such as 
+ * @version 4.0 This Flight class object extends to the Airport class. This class is responsible for storing all necessary items that describe a flight such as 
  * storing the flight ID, flight number, services, ect.
  */
 public class Flight extends Airport{
     //Attributes
     private int ID;
     private String flightNum;
-    //private String originAirport;       //Now in Airport.java
-    //private String originCode;          //Now in Airport.java
-    //private String destinationAirport;  //Now in Airport.java
-    //private String destinationCode;     //Now in Airport.java
     private String departureDate;
     private String departureTime;
     private String arrivalDate;
