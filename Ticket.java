@@ -118,7 +118,6 @@ public class Ticket extends Flight{
         this.classType = classType;
         this.numberOfSeats = numSeats;
         this.classCost = classCost;
-
     }
     /**
      * 

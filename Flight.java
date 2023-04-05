@@ -10,6 +10,10 @@
  * and a grade will be assigned for the work I produced.
  */
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 /**
  * @version 4.0 This Flight class object extends to the Airport class. This class is responsible for storing all necessary items that describe a flight such as 
@@ -529,10 +533,20 @@ public class Flight extends Airport{
      * 
      * @param newDate Given the new departure date, this method will change the new departure date and arrival date appropriately
      */
-    public void changeDepartureDate(String newDate){
-        departureDate = newDate;
-        arrivalDate = newDate;
+    public void changeDepartureDate(String newDate) {
+        LocalDate newDepartureDate = LocalDate.parse(newDate, DateTimeFormatter.ofPattern("MM/dd/yy"));
+        LocalTime newDepartureTime = LocalTime.parse(this.departureTime, DateTimeFormatter.ofPattern("HH:mm:ss"));
+        
+        // Update departure date/time
+        LocalDateTime newDepartureDateTime = LocalDateTime.of(newDepartureDate, newDepartureTime);
+        this.departureDate = newDate;
+        
+        // Update arrival date/time based on new departure date/time and time zone difference
+        LocalDateTime newArrivalDateTime = newDepartureDateTime.plusHours(this.timeZoneDifference);
+        this.arrivalDate = newArrivalDateTime.format(DateTimeFormatter.ofPattern("MM/dd/yy"));
+        this.arrivalTime = newArrivalDateTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
+    
 
     //change departure time and arrival time
     /**
